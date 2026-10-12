@@ -62,3 +62,4 @@ __pycache__/
 # macro rating draft (runtime)
 /app/data/macro-rating-draft.json
 /app/data/*.tmp
+/.rating-sidecar.env
