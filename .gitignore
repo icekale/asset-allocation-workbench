@@ -58,3 +58,7 @@ __pycache__/
 # Local Caixin series whitelist (copy from example; never commit live mappings with secrets)
 /config/caixin-series.json
 /deliverables/
+
+# macro rating draft (runtime)
+/app/data/macro-rating-draft.json
+/app/data/*.tmp
