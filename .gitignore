@@ -54,3 +54,7 @@ next-env.d.ts
 # Python caches
 __pycache__/
 *.py[cod]
+
+# Local Caixin series whitelist (copy from example; never commit live mappings with secrets)
+/config/caixin-series.json
+/deliverables/

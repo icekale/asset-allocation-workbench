@@ -1,6 +1,8 @@
 """Collect official monthly PBC AFRE stock and RMB-loan growth rates."""
 
+import argparse
 import json
+import sys
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -111,26 +113,52 @@ by_period = {row["period"]: row for row in recent_rows}
 by_period.update({row["period"]: row for row in chinese_rows})
 rows.extend(by_period.values())
 rows.sort(key=lambda row: row["period"])
-data = {
-    "unit": "%",
-    "basis": "月末存量同比；人民币贷款为社融构成项“对实体经济发放的人民币贷款余额”，非金融机构人民币贷款总额。2017—2019采用人民银行回溯调整后的官方表；2020—2022采用逐月人民银行存量报告；2023年起采用逐月人民银行金融统计报告。官方原表无法核验的月份保留缺口，不插值。2023年起统计范围变化按人民银行公布的可比口径。",
-    "rows": rows,
-    "historicalSource": HISTORICAL_TABLE,
-    "coverageStart": rows[0]["period"],
-    "coverageEnd": rows[-1]["period"],
-}
-target = ROOT / "app/data/macro-social-financing.json"
-# 定时抓取会整体重写该文件：继承本脚本不产出的字段（flowComponents 等），
-# 否则会把人工/Wind 维护的构成项口径数据一并抹掉。
-if target.exists():
-    try:
-        previous = json.loads(target.read_text())
-    except (json.JSONDecodeError, OSError):
-        previous = None
-    if isinstance(previous, dict):
-        data = {**previous, **data}
-target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
-periods = {row["period"] for row in rows}
-all_months = {f"{year}-{month:02d}" for year in range(2017, 2027) for month in range(1, 13) if f"{year}-{month:02d}" <= "2026-08"}
-missing = sorted(all_months - periods)
-print(f"Wrote {len(rows)} verified official points from {rows[0]['period']} through {rows[-1]['period']}; unverified months left blank: {', '.join(missing) or 'none'}")
+OWNED_KEYS = {"unit", "basis", "rows", "historicalSource", "coverageStart", "coverageEnd"}
+OUTPUT = ROOT / "app/data/macro-social-financing.json"
+
+
+def build_owned_payload(collected_rows):
+    return {
+        "unit": "%",
+        "basis": "月末存量同比；人民币贷款为社融构成项“对实体经济发放的人民币贷款余额”，非金融机构人民币贷款总额。2017—2019采用人民银行回溯调整后的官方表；2020—2022采用逐月人民银行存量报告；2023年起采用逐月人民银行金融统计报告。官方原表无法核验的月份保留缺口，不插值。2023年起统计范围变化按人民银行公布的可比口径。",
+        "rows": collected_rows,
+        "historicalSource": HISTORICAL_TABLE,
+        "coverageStart": collected_rows[0]["period"],
+        "coverageEnd": collected_rows[-1]["period"],
+    }
+
+
+def persist(collected_rows, *, force=False, output=None):
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from json_merge_guard import load_existing, merge_preserve, write_merged
+
+    owned = build_owned_payload(collected_rows)
+    target = output or OUTPUT
+    baseline = load_existing(OUTPUT)
+    merged = merge_preserve(
+        baseline,
+        owned,
+        owned_keys=OWNED_KEYS,
+        force=force,
+        series_paths=[("rows",)],
+    )
+    write_merged(target, merged)
+    periods = {row["period"] for row in collected_rows}
+    all_months = {f"{year}-{month:02d}" for year in range(2017, 2027) for month in range(1, 13) if f"{year}-{month:02d}" <= "2026-08"}
+    missing = sorted(all_months - periods)
+    preserved = sorted(set(merged) - OWNED_KEYS)
+    print(
+        f"Wrote {len(collected_rows)} verified official points from {collected_rows[0]['period']} through {collected_rows[-1]['period']}; "
+        f"unverified months left blank: {', '.join(missing) or 'none'}; "
+        f"preserved keys: {', '.join(preserved) or 'none'}"
+    )
+
+
+if __name__ == "__main__":
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from json_merge_guard import add_force_argument
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_force_argument(parser)
+    args = parser.parse_args()
+    persist(rows, force=args.force, output=args.output)
+

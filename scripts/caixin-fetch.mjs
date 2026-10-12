@@ -1,3 +1,4 @@
+import { access } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import { getCaixinObservations, getCaixinSeries, searchCaixinSeries } from "../lib/caixin.ts";
 
@@ -13,10 +14,23 @@ async function loadEnv(path) {
   return values;
 }
 
-const local = await loadEnv(process.env.CAIXIN_ENV_FILE ?? ".env.local");
+async function resolveEnvFile() {
+  if (process.env.CAIXIN_ENV_FILE) return process.env.CAIXIN_ENV_FILE;
+  for (const candidate of [".env.caixin", ".env.local"]) {
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      /* try next */
+    }
+  }
+  return ".env.local";
+}
+
+const local = await loadEnv(await resolveEnvFile());
 const config = {
   apiKey: process.env.CAIXIN_API_KEY ?? local.CAIXIN_API_KEY ?? "",
-  baseUrl: process.env.CAIXIN_API_BASE_URL ?? local.CAIXIN_API_BASE_URL,
+  baseUrl: process.env.CAIXIN_API_BASE_URL ?? process.env.CAIXIN_API_BASE ?? local.CAIXIN_API_BASE_URL ?? local.CAIXIN_API_BASE,
   userAgent: process.env.CAIXIN_API_USER_AGENT ?? local.CAIXIN_API_USER_AGENT,
 };
 const [command, value] = process.argv.slice(2);

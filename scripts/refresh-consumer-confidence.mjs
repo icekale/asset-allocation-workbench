@@ -9,7 +9,7 @@ import {
   normalizePeriod,
   parseOfficialLevel,
 } from "../lib/consumer-confidence.mjs";
-import { caixinConfigFromValues, getCaixinObservations, searchCaixinSeries } from "../lib/caixin.ts";
+import { caixinConfigFromValues, getCaixinObservations, getCaixinSeries, searchCaixinSeries, unwrapCaixinSearchSeries } from "../lib/caixin.ts";
 
 const root = process.cwd();
 const reportPath = resolve(process.env.CCI_REFRESH_REPORT || "output/consumer-confidence-refresh.json");
@@ -141,46 +141,80 @@ function runWind() {
 }
 
 async function loadCaixinConfig() {
-  const values = { CAIXIN_API_KEY: process.env.CAIXIN_API_KEY ?? "", CAIXIN_API_BASE_URL: process.env.CAIXIN_API_BASE_URL,
-    CAIXIN_API_USER_AGENT: process.env.CAIXIN_API_USER_AGENT };
-  if (!values.CAIXIN_API_KEY) {
+  const values = {
+    CAIXIN_API_KEY: process.env.CAIXIN_API_KEY ?? "",
+    CAIXIN_API_BASE_URL: process.env.CAIXIN_API_BASE_URL ?? process.env.CAIXIN_API_BASE,
+    CAIXIN_API_USER_AGENT: process.env.CAIXIN_API_USER_AGENT,
+  };
+  const envFiles = [process.env.CAIXIN_ENV_FILE, ".env.caixin", ".env.local"].filter(Boolean);
+  for (const file of envFiles) {
+    if (values.CAIXIN_API_KEY && values.CAIXIN_API_BASE_URL && values.CAIXIN_API_USER_AGENT) break;
     try {
-      const text = await readFile(resolve(".env.local"), "utf8");
+      const text = await readFile(resolve(file), "utf8");
       for (const line of text.split(/\r?\n/)) {
-        const match = line.match(/^\s*(CAIXIN_API_KEY|CAIXIN_API_BASE_URL|CAIXIN_API_USER_AGENT)\s*=\s*(.*?)\s*$/);
-        if (match && !values[match[1]]) values[match[1]] = match[2];
+        const match = line.match(/^\s*(CAIXIN_API_KEY|CAIXIN_API_BASE_URL|CAIXIN_API_BASE|CAIXIN_API_USER_AGENT)\s*=\s*(.*?)\s*$/);
+        if (!match) continue;
+        const key = match[1] === "CAIXIN_API_BASE" ? "CAIXIN_API_BASE_URL" : match[1];
+        if (!values[key]) values[key] = match[2];
       }
     } catch { /* optional local config */ }
   }
   return caixinConfigFromValues(values);
 }
 
-async function caixinRows() {
-  const config = await loadCaixinConfig();
-  const found = await searchCaixinSeries("中国 消费者信心指数", config, { pageSize: 50, country: "CN" });
-  const candidates = (found.series ?? []).filter((series) => series.name.includes("消费者信心指数")
+const PREFERRED_CCI_SERIES_ID = "5198401";
+
+function isConsumerConfidenceLevelSeries(series) {
+  return Boolean(series?.name?.includes("消费者信心指数")
+    && !/满意|预期/.test(series.name ?? "")
     && /国家统计局|中国统计信息服务中心/.test(series.source ?? "")
     && /^(点|points?)$/i.test(series.unit ?? "")
     && /(月|monthly|^m$)/i.test(series.frequency ?? ""));
-  if (candidates.length !== 1) throw new Error(`财新精确匹配序列数为 ${candidates.length}，拒绝自动选取`);
-  const series = candidates[0];
+}
+
+async function caixinRows() {
+  const config = { ...(await loadCaixinConfig()), timeoutMs: 30_000, maxRetries: 3 };
+  let seriesId = PREFERRED_CCI_SERIES_ID;
+  // Search is best-effort confirmation; the known NBS level series id is the source of truth.
+  try {
+    const found = await searchCaixinSeries("消费者信心指数", config, { pageSize: 50, country: "中国" });
+    const list = Array.isArray(found.series) ? found.series : unwrapCaixinSearchSeries(found.raw ?? found.series);
+    const preferred = list.find((item) => String(item.series_id) === PREFERRED_CCI_SERIES_ID);
+    const candidates = list.filter(isConsumerConfidenceLevelSeries);
+    const matched = (preferred && isConsumerConfidenceLevelSeries(preferred))
+      ? preferred
+      : candidates.length === 1
+        ? candidates[0]
+        : null;
+    if (matched) seriesId = String(matched.series_id);
+  } catch {
+    // Fall through to direct meta/observations for the preferred series.
+  }
+  if (seriesId !== PREFERRED_CCI_SERIES_ID) {
+    throw new Error(`财新匹配到非首选序列 ${seriesId}，期望 ${PREFERRED_CCI_SERIES_ID}`);
+  }
   const [year, month] = endPeriod.split("-").map(Number);
   const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
-  const result = await getCaixinObservations(series.series_id, config, { start: `${startPeriod}-01`, end: `${endPeriod}-${lastDay}`, order: "asc", pageSize: 1000 });
-  const checked = await (await import("../lib/caixin.ts")).getCaixinSeries(series.series_id, config);
+  const checked = await getCaixinSeries(seriesId, config);
   const meta = checked.series;
-  if (!meta.name.includes("消费者信心指数") || !/国家统计局|中国统计信息服务中心/.test(meta.source ?? "") || !/^(点|points?)$/i.test(meta.unit ?? "") || !/(月|monthly|^m$)/i.test(meta.frequency ?? "")) {
+  if (!meta.name.includes("消费者信心指数") || /满意|预期/.test(meta.name)
+    || !/国家统计局|中国统计信息服务中心/.test(meta.source ?? "")
+    || !/^(点|points?)$/i.test(meta.unit ?? "")
+    || !/(月|monthly|^m$)/i.test(meta.frequency ?? "")) {
     throw new Error("财新序列元数据与指标口径不匹配");
   }
+  const result = await getCaixinObservations(seriesId, config, { start: `${startPeriod}-01`, end: `${endPeriod}-${lastDay}`, order: "asc", pageSize: 200 });
   return normalizeObservations(result.series.observations.map((row) => ({ date: row.date, value: row.value })), {
-    sourceId: `财新序列 ${series.series_id}`, source: meta.source, unit: meta.unit, frequency: "月度", basis: "月度消费者信心指数水平", sourceUrl: null,
+    sourceId: `财新序列 ${seriesId}`, source: meta.source, unit: meta.unit, frequency: "月度", basis: "月度消费者信心指数水平", sourceUrl: null,
   }).filter((row) => row.period >= startPeriod && row.period <= endPeriod);
 }
 
 const official = await officialRows();
 let wind = [];
 let caixin = [];
-if (process.env.CCI_SKIP_VENDOR !== "1") {
+const skipVendor = process.env.CCI_SKIP_VENDOR === "1";
+const skipWind = skipVendor || process.env.CCI_SKIP_WIND === "1";
+if (!skipWind) {
   try {
     const result = await runWind();
     wind = result.rows;
@@ -188,8 +222,10 @@ if (process.env.CCI_SKIP_VENDOR !== "1") {
   } catch (error) {
     stages.push({ source: "wind", status: "unavailable", reason: error.message });
   }
+} else {
+  stages.push({ source: "wind", status: "skipped", reason: "CCI_SKIP_WIND or CCI_SKIP_VENDOR" });
 }
-if (process.env.CCI_SKIP_VENDOR !== "1" && wind.length < coverage(official, startPeriod, endPeriod).expected) {
+if (!skipVendor && wind.length < coverage(official, startPeriod, endPeriod).expected) {
   try {
     caixin = await caixinRows();
     stages.push({ source: "caixin", status: "ok", observations: caixin.length });

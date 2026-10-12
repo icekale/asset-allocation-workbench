@@ -53,6 +53,34 @@ const report = {
   decisions,
 };
 const output = process.env.CAIXIN_SYNC_REPORT || path.join(projectRoot, "output", "caixin-sync-report.json");
+
+// Optional local whitelist (config/caixin-series.json): annotate audit rows only; never overwrite payload/scores.
+try {
+  const { loadCaixinSeriesConfig, enabledCaixinMappings } = await import("../lib/caixin-series-config.ts");
+  const { config: seriesConfig, path: seriesConfigPath } = await loadCaixinSeriesConfig(projectRoot);
+  const whitelist = enabledCaixinMappings(seriesConfig);
+  report.whitelist = {
+    path: seriesConfigPath,
+    policy: seriesConfig.policy,
+    enabled: whitelist.map((item) => ({
+      targetKey: item.targetKey,
+      seriesId: item.id,
+      scale: item.scale ?? 1,
+      notes: item.notes ?? null,
+    })),
+  };
+  for (const item of whitelist) {
+    const current = decisions.find((row) => row.id === item.targetKey);
+    if (current) {
+      current.whitelistSeriesId = item.id;
+      current.whitelistEnabled = true;
+      current.whitelistScale = item.scale ?? 1;
+    }
+  }
+} catch (error) {
+  report.whitelist = { skipped: true, reason: error instanceof Error ? error.message : "whitelist_unavailable" };
+}
+
 await fs.mkdir(path.dirname(output), { recursive: true });
 await fs.writeFile(output, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ ...report.summary, output }));
