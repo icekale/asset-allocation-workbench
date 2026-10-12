@@ -15,6 +15,7 @@ import socialFinancing from "../data/macro-social-financing.json";
 import moneySupply from "../data/macro-money-supply.json";
 import leverage from "../data/macro-leverage.json";
 import macroPolicy from "../data/macro-policy.json";
+import dataRevision from "../data/data-revision.json";
 import { PolicyTracker } from "./PolicyTracker";
 import { CoreMeetingTracker } from "./CoreMeetingTracker";
 import { MacroRatingWorkbook, macroRatingHeadline } from "./MacroRatingV1";
@@ -36,13 +37,23 @@ const pct = (value: number, digits = 1) => `${(value * 100).toFixed(digits)}%`;
 const signedPct = (value: number) => `${value >= 0 ? "+" : ""}${(value * 100).toFixed(1)}%`;
 const score = (value: number) => `${value > 0 ? "+" : ""}${value.toFixed(2)}`;
 
-function freshness(input: MarketInputPayload) {
-  const age = Date.now() - Date.parse(input.collectedAt);
+function formatAgeLabel(iso: string | null | undefined, suffix = "更新") {
+  if (!iso) return "更新时间未知";
+  const age = Date.now() - Date.parse(iso);
   if (!Number.isFinite(age)) return "更新时间未知";
   const hours = Math.max(0, Math.floor(age / 3_600_000));
-  if (hours < 1) return "刚刚更新";
-  if (hours < 24) return `${hours} 小时前更新`;
-  return `${Math.floor(hours / 24)} 天前更新`;
+  if (hours < 1) return `刚刚${suffix}`;
+  if (hours < 24) return `${hours} 小时前${suffix}`;
+  return `${Math.floor(hours / 24)} 天前${suffix}`;
+}
+
+/** Topbar "N 天前" should track last official macro apply, not the seed portfolio payload. */
+function freshness(input: MarketInputPayload) {
+  const macroAt = (dataRevision as { refreshedAt?: string } | null)?.refreshedAt;
+  if (macroAt && Number.isFinite(Date.parse(macroAt))) {
+    return formatAgeLabel(macroAt, "更新");
+  }
+  return formatAgeLabel(input.collectedAt, "更新");
 }
 
 function ResearchHeader({ kicker, title, note }: { kicker: string; title: string; note: string }) {
@@ -1288,7 +1299,7 @@ export function Dashboard({ initialPayload }: { initialPayload: MarketInputPaylo
   }
 
   return <main className="app-shell">
-    <header className="topbar"><div><p className="eyebrow">ASSET ALLOCATION WORKBENCH</p><h1>资产配置工作台</h1></div><div className="topbar-actions"><div className="live-status"><span /><div><strong>{freshness(payload)}</strong><small>组合数据日 {payload.asOf}</small></div></div><button className="ghost-button" onClick={() => void refresh()} disabled={refreshing}>{refreshing ? "同步中…" : "同步最新"}</button><button className="ghost-button" onClick={logout}>退出</button></div></header>
+    <header className="topbar"><div><p className="eyebrow">ASSET ALLOCATION WORKBENCH</p><h1>资产配置工作台</h1></div><div className="topbar-actions"><div className="live-status"><span /><div><strong>{freshness(payload)}</strong><small>宏观采集 · 组合数据日 {payload.asOf}</small></div></div><button className="ghost-button" onClick={() => void refresh()} disabled={refreshing}>{refreshing ? "同步中…" : "同步最新"}</button><button className="ghost-button" onClick={logout}>退出</button></div></header>
     <div className={`data-banner ${payload.status}`}><strong>{payload.status === "verified" ? "本期数据已核验" : payload.status === "partial" ? "部分数据已核验" : "初始模板数据"}</strong><span>{payload.notes[0]}</span>{message ? <em>{message}</em> : null}</div>
     <section className="ic-strip"><div><span>宏观评级</span><strong>{macroRatingHeadline}</strong></div><div><span>增长范式</span><strong>{advisory.regime}</strong></div><div><span>当前组合</span><strong>{model.allocations.map((item) => `${item.asset}${pct(item.current, 0)}`).join(" · ")}</strong></div><div><span>模型状态</span><strong>{model.checks.status}</strong></div></section>
     <nav className="tabs primary-tabs" aria-label="五层投顾体系">{PRIMARY_TABS.map((item, index) => <button key={item} className={tab === item ? "active" : ""} onClick={() => setTab(item)}><span>0{index + 1}</span>{item}</button>)}</nav>

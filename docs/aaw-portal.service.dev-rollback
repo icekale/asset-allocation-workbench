@@ -1,0 +1,3 @@
+# Rollback to vinext dev if prod start fails:
+# ExecStart=/bin/bash -lc "cd /root/aaw && ./node_modules/.bin/vinext dev -p 8788 --host ::1"
+# StandardOutput/Error: /var/log/aaw/vinext-dev.log

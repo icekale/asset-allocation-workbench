@@ -135,7 +135,8 @@ async function hasCaixinKey() {
   const envFile = await resolveEnvFile();
   if (!envFile) return false;
   try {
-    const text = await readFile(path.join(root, envFile), "utf8");
+    const full = path.isAbsolute(envFile) ? envFile : path.join(root, envFile);
+    const text = await readFile(full, "utf8");
     return /^CAIXIN_API_KEY=.+/m.test(text);
   } catch {
     return false;

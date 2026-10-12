@@ -24,7 +24,7 @@
     "index:refresh": "node --experimental-strip-types scripts/refresh-index.mjs",
     "macro:official:refresh": "node scripts/refresh-official-macro.mjs",
     "launchd:install": "bash scripts/install-launchd.sh",
-    "test:automation": "node --experimental-strip-types --test tests/index-quote.test.mjs tests/index-refresh.test.mjs tests/stale-check.test.mjs tests/collector-run-guard.test.mjs",
+    "test:automation": "node --experimental-strip-types --test tests/index-quote.test.mjs tests/index-refresh.test.mjs tests/stale-check.test.mjs tests/collector-run-guard.test.mjs tests/gdp-deflator-retry.test.mjs",
     "test:providers": "node --experimental-strip-types --test tests/caixin-client.test.mjs tests/caixin-mapping.test.mjs tests/wind-provider.test.mjs tests/wind-mcp.test.mjs",
     "collector:audit": "node --experimental-strip-types scripts/collector-run.mjs --mode=audit",
     "collector:apply": "node --experimental-strip-types scripts/collector-run.mjs --mode=apply",

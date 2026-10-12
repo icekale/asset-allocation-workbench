@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-27T00:25:53.000Z",
-  "dataThrough": "指标分项截至 2026-09-24；多年趋势于 2026-09-27 复核；研究观点为 2026-07 快照",
+  "updatedAt": "2026-10-12",
+  "dataThrough": "2026-10-10",
   "regime": "温和增长 · 结构分化",
   "macroState": "状态 III｜中性平稳（暂定）",
   "coreConflict": "外需与制造韧性，对冲内需、地产与信用传导偏弱",
@@ -8,11 +8,26 @@
     "asOf": "2026-09-30",
     "summary": "9月制造业PMI回升至50.1%，生产和新订单均处扩张区间；8月规上工业增加值同比增长5.2%，生产端仍有韧性。但8月社零仅增长0.4%，前8个月房地产开发投资下降19.9%，内需与地产仍是主要拖累。8月末社融存量同比增长7.2%，M1增速低于M2，提示资金活化仍待观察。下一阶段重点看新订单能否持续、居民信贷和地产销售是否改善，以及政策能否带动消费与民间投资回升。",
     "sources": [
-      { "label": "9月制造业PMI", "url": "https://www.stats.gov.cn/zwfwck/sjfb/202609/t20260930_1965449.html" },
-      { "label": "8月工业生产", "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965308.html" },
-      { "label": "8月社会消费品零售", "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965311.html" },
-      { "label": "1—8月房地产", "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965310.html" },
-      { "label": "8月金融统计", "url": "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026091414593871200/index.html" }
+      {
+        "label": "9月制造业PMI",
+        "url": "https://www.stats.gov.cn/zwfwck/sjfb/202609/t20260930_1965449.html"
+      },
+      {
+        "label": "8月工业生产",
+        "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965308.html"
+      },
+      {
+        "label": "8月社会消费品零售",
+        "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965311.html"
+      },
+      {
+        "label": "1—8月房地产",
+        "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965310.html"
+      },
+      {
+        "label": "8月金融统计",
+        "url": "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2026091414593871200/index.html"
+      }
     ]
   },
   "macroNote": "现行 62 项指标均已有已核验观测值；各项采用各自的观测周期，并非都更新至 9 月。宏观观点、情景和资产评级仍为 7 月研究快照，暂不发布加权总分。",
@@ -978,12 +993,12 @@
       "frequency": "日度",
       "purpose": "判断外需、汇率和跨境资金约束",
       "expectedSource": "中国外汇交易中心 / 中间价",
-      "currentValue": "6.7489",
-      "prior": "2026-09-23：6.7468",
-      "period": "2026-09-24",
-      "trend": "较前一交易日上行 0.0021 元；人民币相应略贬",
+      "currentValue": "6.733",
+      "prior": "2026-09-24：6.7489",
+      "period": "2026-10-09",
+      "trend": "较上次已核验日度观测下行约 0.0159 元；人民币相应略升",
       "score": 5,
-      "currentSource": "国家外汇管理局人民币汇率中间价（每百美元报价除以 100）",
+      "currentSource": "财新 API（中国外汇交易中心中间价；官方日度缺口补齐）",
       "assetMeaning": "有利人民币资产估值与外资风险偏好，但出口价格竞争力需跟踪",
       "status": "已核验",
       "scoreRules": {
@@ -1004,12 +1019,12 @@
       "frequency": "周度",
       "purpose": "判断外需、汇率和跨境资金约束",
       "expectedSource": "中国外汇交易中心 / 一篮子货币",
-      "currentValue": "102.54",
-      "prior": "101.49",
-      "period": "2026-09-18",
-      "trend": "较上期上升",
+      "currentValue": "103.61",
+      "prior": "2026-09-18：102.54",
+      "period": "2026-10-09",
+      "trend": "较上次已核验周度读数上升；财新日度作缺口对照",
       "score": 3,
-      "currentSource": "中国货币网（Wind M0325601）",
+      "currentSource": "财新 API（中国外汇交易中心 CFETS；官方周度缺口补齐）",
       "assetMeaning": null,
       "status": "已核验",
       "scoreRules": {
@@ -1212,10 +1227,10 @@
       "frequency": "月度",
       "purpose": "跟踪经济边际动能",
       "expectedSource": "国家统计局",
-      "currentValue": "89.2",
-      "prior": null,
-      "period": "2026-07（最近已核验）",
-      "trend": "8 月同口径值尚未核验，不以其他信心指标替代",
+      "currentValue": "89.5",
+      "prior": "2026-07：89.2",
+      "period": "2026-08",
+      "trend": "较 7 月略升 0.3；仍低于 90 深度偏弱区间上沿",
       "score": null,
       "currentSource": "财新 API（国家统计局）",
       "assetMeaning": null,
@@ -2202,12 +2217,12 @@
       "frequency": "日度",
       "purpose": "评估流动性和利率政策方向",
       "expectedSource": "中国货币网 / 银行间7天回购利率",
-      "currentValue": "1.3946%",
-      "prior": "1.3841%",
-      "period": "2026-09-24",
-      "trend": "较上期上升",
+      "currentValue": "1.3241%",
+      "prior": "2026-09-24：1.3946%",
+      "period": "2026-10-10",
+      "trend": "较上次已核验日度观测下行",
       "score": 4,
-      "currentSource": "中国货币网（Wind M1006337）",
+      "currentSource": "财新 API（中国货币网 DR007；官方日度缺口补齐）",
       "assetMeaning": null,
       "status": "已核验",
       "scoreRules": {
@@ -2228,12 +2243,12 @@
       "frequency": "日度",
       "purpose": "评估流动性和利率政策方向",
       "expectedSource": "中国货币网 / 全市场7天回购利率",
-      "currentValue": "1.4263%",
-      "prior": "1.4303%",
-      "period": "2026-09-24",
-      "trend": "较上期下降",
+      "currentValue": "1.3316%",
+      "prior": "2026-09-24：1.4263%",
+      "period": "2026-10-10",
+      "trend": "较上次已核验日度观测下行",
       "score": 4,
-      "currentSource": "中国货币网（Wind M0041653）",
+      "currentSource": "财新 API（中国货币网 R007；官方日度缺口补齐）",
       "assetMeaning": null,
       "status": "已核验",
       "scoreRules": {
@@ -2334,10 +2349,22 @@
     ],
     "note": "2022—2025 仅比较同一指标的完整年度值；2026 最新观测单列并标出季度、当月或年初累计口径，不连入年度趋势线。",
     "annualSources": [
-      { "year": "2022", "url": "https://www.stats.gov.cn/sj/zxfb/202302/t20230228_1919011.html" },
-      { "year": "2023", "url": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202402/t20240229_1947923.html" },
-      { "year": "2024", "url": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202502/t20250228_1958817.html" },
-      { "year": "2025", "url": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202602/t20260228_1962662.html" }
+      {
+        "year": "2022",
+        "url": "https://www.stats.gov.cn/sj/zxfb/202302/t20230228_1919011.html"
+      },
+      {
+        "year": "2023",
+        "url": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202402/t20240229_1947923.html"
+      },
+      {
+        "year": "2024",
+        "url": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202502/t20250228_1958817.html"
+      },
+      {
+        "year": "2025",
+        "url": "https://www.stats.gov.cn/xxgk/sjfb/tjgb2020/202602/t20260228_1962662.html"
+      }
     ],
     "series": [
       {
@@ -2345,7 +2372,12 @@
         "group": "经济运行",
         "unit": "%",
         "basis": "全年实际同比",
-        "values": [3, 5.2, 5, 5],
+        "values": [
+          3,
+          5.2,
+          5,
+          5
+        ],
         "latestIndicatorId": "M02",
         "interpretation": "年度总量增速稳定；二季度单季读数用于观察近期变化。"
       },
@@ -2354,7 +2386,12 @@
         "group": "增长动力",
         "unit": "%",
         "basis": "全年实际同比",
-        "values": [3.6, 4.6, 5.8, 5.9],
+        "values": [
+          3.6,
+          4.6,
+          5.8,
+          5.9
+        ],
         "latestIndicatorId": "M21",
         "interpretation": "补足 GDP 之外的生产端信息，月度波动不与全年增速直接相减。"
       },
@@ -2363,7 +2400,12 @@
         "group": "经济运行",
         "unit": "%",
         "basis": "全年平均同比",
-        "values": [2, 0.2, 0.2, 0],
+        "values": [
+          2,
+          0.2,
+          0.2,
+          0
+        ],
         "latestIndicatorId": "M05",
         "interpretation": "区分全年平均通胀与单月同比，避免把短期食品扰动当作趋势。"
       },
@@ -2372,7 +2414,12 @@
         "group": "经济运行",
         "unit": "%",
         "basis": "全年平均同比",
-        "values": [4.1, -3, -2.2, -2.6],
+        "values": [
+          4.1,
+          -3,
+          -2.2,
+          -2.6
+        ],
         "latestIndicatorId": "M08",
         "interpretation": "反映工业品价格方向；需结合环比与利润验证传导。"
       },
@@ -2381,7 +2428,12 @@
         "group": "经济运行",
         "unit": "%",
         "basis": "全年平均水平",
-        "values": [5.6, 5.2, 5.1, 5.2],
+        "values": [
+          5.6,
+          5.2,
+          5.1,
+          5.2
+        ],
         "latestIndicatorId": "M15",
         "interpretation": "总量稳定，消费仍需结合工资、青年就业与信心判断。"
       },
@@ -2390,7 +2442,12 @@
         "group": "增长动力",
         "unit": "%",
         "basis": "全年名义同比",
-        "values": [-0.2, 7.2, 3.5, 3.7],
+        "values": [
+          -0.2,
+          7.2,
+          3.5,
+          3.7
+        ],
         "latestIndicatorId": "M40",
         "interpretation": "商品消费的年度结果；当月同比仅显示近期动能。"
       },
@@ -2399,7 +2456,12 @@
         "group": "增长动力",
         "unit": "%",
         "basis": "全年累计同比",
-        "values": [5.1, 3, 3.2, -3.8],
+        "values": [
+          5.1,
+          3,
+          3.2,
+          -3.8
+        ],
         "latestIndicatorId": "M34",
         "interpretation": "投资总量放缓，需再看制造、基建和地产结构。"
       },
@@ -2408,7 +2470,12 @@
         "group": "增长动力",
         "unit": "%",
         "basis": "全年累计同比",
-        "values": [-24.3, -8.5, -12.9, -8.7],
+        "values": [
+          -24.3,
+          -8.5,
+          -12.9,
+          -8.7
+        ],
         "latestIndicatorId": "M26",
         "interpretation": "比开发投资更贴近居民购房需求，和投资读数配合判断。"
       },
@@ -2417,7 +2484,12 @@
         "group": "增长动力",
         "unit": "%",
         "basis": "全年累计同比",
-        "values": [-10, -9.6, -10.6, -17.2],
+        "values": [
+          -10,
+          -9.6,
+          -10.6,
+          -17.2
+        ],
         "latestIndicatorId": "M37",
         "interpretation": "滞后于销售的投资结果，单独观察地产链拖累。"
       },
@@ -2426,7 +2498,12 @@
         "group": "金融信贷",
         "unit": "%",
         "basis": "年末同比",
-        "values": [9.6, 9.5, 8, 8.3],
+        "values": [
+          9.6,
+          9.5,
+          8,
+          8.3
+        ],
         "latestIndicatorId": "M49",
         "interpretation": "补足信用周期信息；总量还需与居民、企业信贷结构合看。"
       },
@@ -2435,7 +2512,12 @@
         "group": "宏观调控",
         "unit": "%",
         "basis": "全年累计同比",
-        "values": [6.1, 5.4, 3.6, 1],
+        "values": [
+          6.1,
+          5.4,
+          3.6,
+          1
+        ],
         "latestIndicatorId": "M58",
         "interpretation": "观察财政支出力度，不把支出增速直接等同于实物工作量。"
       },
@@ -2444,16 +2526,47 @@
         "group": "增长动力",
         "unit": "%",
         "basis": "全年人民币名义同比",
-        "values": [7.7, 0.2, 5, 3.8],
-        "latest": { "value": "17.6%", "period": "2026年1—8月累计", "source": "国家统计局", "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965307.html" },
+        "values": [
+          7.7,
+          0.2,
+          5,
+          3.8
+        ],
+        "latest": {
+          "value": "17.6%",
+          "period": "2026年1—8月累计",
+          "source": "国家统计局",
+          "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965307.html"
+        },
         "interpretation": "统一使用人民币名义口径；总额受价格和进口共同影响。"
       }
     ],
     "leadingSignals": [
-      { "label": "制造业 PMI 新订单", "value": "50.6", "unit": "%", "period": "2026-08", "source": "国家统计局", "url": "https://www.stats.gov.cn/sj/zxfb/202608/t20260831_1965154.html", "note": "领先需求信号；月度值，不接入年度同比趋势。" },
-      { "label": "消费者信心指数", "indicatorId": "M20", "note": "最近已核验至 7 月；8 月同口径值未核验，不用其他信心指标替代。" },
-      { "label": "核心 CPI 同比", "indicatorId": "M07", "note": "辅助区分广义价格回升与食品、能源扰动。" },
-      { "label": "M1-M2 剪刀差", "indicatorId": "M54", "note": "2025 年 M1 统计口径调整，仅展示当前读数，不跨旧口径绘制多年线。", "url": "https://www.pbc.gov.cn/rmyh/109339/2025080818580470423/index.html" }
+      {
+        "label": "制造业 PMI 新订单",
+        "value": "50.6",
+        "unit": "%",
+        "period": "2026-08",
+        "source": "国家统计局",
+        "url": "https://www.stats.gov.cn/sj/zxfb/202608/t20260831_1965154.html",
+        "note": "领先需求信号；月度值，不接入年度同比趋势。"
+      },
+      {
+        "label": "消费者信心指数",
+        "indicatorId": "M20",
+        "note": "最近已核验至 7 月；8 月同口径值未核验，不用其他信心指标替代。"
+      },
+      {
+        "label": "核心 CPI 同比",
+        "indicatorId": "M07",
+        "note": "辅助区分广义价格回升与食品、能源扰动。"
+      },
+      {
+        "label": "M1-M2 剪刀差",
+        "indicatorId": "M54",
+        "note": "2025 年 M1 统计口径调整，仅展示当前读数，不跨旧口径绘制多年线。",
+        "url": "https://www.pbc.gov.cn/rmyh/109339/2025080818580470423/index.html"
+      }
     ]
   },
   "macroExtensions": [

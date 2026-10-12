@@ -161,7 +161,7 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919305.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919306.html",
@@ -206,11 +206,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919337.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919338.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 4.5,
@@ -228,7 +228,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919342.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3.2,
@@ -242,11 +242,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919353.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919352.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3.6,
@@ -264,7 +264,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919060.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3.4,
@@ -282,7 +282,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919074.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3,
@@ -300,7 +300,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919085.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.2,
@@ -318,7 +318,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919102.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.8,
@@ -336,7 +336,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919114.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2,
@@ -347,14 +347,18 @@
     },
     {
       "period": "2012-09",
-      "cpi": 1.9,
-      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919125.html",
       "auditNotes": [
         {
+          "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919125.html",
+          "status": "RuntimeError"
+        },
+        {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919124.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
+      "cpi": 1.9,
+      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919125.html",
       "ppi": -3.6,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919124.html",
       "scissors": -5.5
@@ -368,7 +372,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919138.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.7,
@@ -382,11 +386,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919150.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202303/t20230301_1919151.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2,
@@ -400,11 +404,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898248.html",
-          "status": "RuntimeError"
+          "status": "value-not-found"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898249.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.5,
@@ -418,11 +422,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898263.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898264.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2,
@@ -440,7 +444,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898269.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3.2,
@@ -454,11 +458,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898280.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898279.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.1,
@@ -472,11 +476,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898294.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898295.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.4,
@@ -490,11 +494,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898308.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898309.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.1,
@@ -508,17 +512,17 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898319.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898320.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
-      "cpi": 2.7,
-      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898319.html",
       "ppi": -2.7,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898320.html",
+      "cpi": 2.7,
+      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898319.html",
       "scissors": -5.4
     },
     {
@@ -526,11 +530,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898335.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898336.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.7,
@@ -544,11 +548,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898348.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898349.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.6,
@@ -562,11 +566,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898366.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898365.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3.1,
@@ -580,11 +584,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898398.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898397.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 3.2,
@@ -598,7 +602,7 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898407.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898406.html",
@@ -616,11 +620,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898425.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898424.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.5,
@@ -634,11 +638,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898447.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898448.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.5,
@@ -652,11 +656,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898464.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898465.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2,
@@ -670,11 +674,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898482.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898481.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.4,
@@ -688,11 +692,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898504.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898503.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.8,
@@ -706,11 +710,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898527.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898526.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.5,
@@ -728,7 +732,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898544.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.3,
@@ -742,11 +746,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898565.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898566.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2.3,
@@ -760,11 +764,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898583.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898584.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 2,
@@ -782,7 +786,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898604.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.6,
@@ -796,11 +800,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898622.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898623.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.6,
@@ -814,11 +818,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898641.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898642.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.4,
@@ -832,11 +836,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898668.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898669.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 1.5,
@@ -850,11 +854,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898695.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898696.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "cpi": 0.8,
@@ -1340,15 +1344,15 @@
       "cpi": 5.4,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900631.html",
       "ppi": 0.1,
-      "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202002/t20200210_1767758.html",
+      "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900632.html",
+      "coreCpi": 1.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896300.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896300.html",
           "status": "core-not-found"
         }
       ],
-      "coreCpi": 1.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896300.html",
       "scissors": -5.3
     },
     {
@@ -1357,14 +1361,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900647.html",
       "ppi": -0.4,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900648.html",
+      "coreCpi": 1,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202003/t20200310_1764907.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202003/t20200310_1764907.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202003/t20200310_1764907.html",
       "scissors": -5.6
     },
     {
@@ -1373,14 +1377,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900673.html",
       "ppi": -1.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900674.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896317.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896317.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896317.html",
       "scissors": -5.8
     },
     {
@@ -1389,14 +1393,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202005/t20200514_1767711.html",
       "ppi": -3.1,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900715.html",
+      "coreCpi": 1.1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896337.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896337.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896337.html",
       "scissors": -6.4
     },
     {
@@ -1405,14 +1409,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900746.html",
       "ppi": -3.7,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900747.html",
+      "coreCpi": 1.1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896351.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896351.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896351.html",
       "scissors": -6.1
     },
     {
@@ -1420,15 +1424,15 @@
       "cpi": 2.5,
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202007/t20200709_1774630.html",
       "ppi": -3,
-      "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202007/t20200709_1774631.html",
+      "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900771.html",
+      "coreCpi": 0.9,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202007/t20200709_1774634.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202007/t20200709_1774634.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.9,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202007/t20200709_1774634.html",
       "scissors": -5.5
     },
     {
@@ -1436,15 +1440,15 @@
       "cpi": 2.7,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900813.html",
       "ppi": -2.4,
-      "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900814.html",
+      "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202008/t20200810_1781879.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896380.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896380.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896380.html",
       "scissors": -5.1
     },
     {
@@ -1453,14 +1457,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900841.html",
       "ppi": -2,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900842.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896390.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896390.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896390.html",
       "scissors": -4.4
     },
     {
@@ -1469,14 +1473,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202010/t20201015_1794143.html",
       "ppi": -2.1,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900868.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896400.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896400.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896400.html",
       "scissors": -3.8
     },
     {
@@ -1485,14 +1489,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900902.html",
       "ppi": -2.1,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900903.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896417.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896417.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896417.html",
       "scissors": -2.6
     },
     {
@@ -1501,14 +1505,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900924.html",
       "ppi": -1.5,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202012/t20201209_1808129.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896425.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896425.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896425.html",
       "scissors": -1
     },
     {
@@ -1516,15 +1520,15 @@
       "cpi": 0.2,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900958.html",
       "ppi": -0.4,
-      "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202101/t20210111_1812262.html",
+      "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900959.html",
+      "coreCpi": 0.4,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896435.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896435.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.4,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896435.html",
       "scissors": -0.6
     },
     {
@@ -1534,7 +1538,7 @@
       "ppi": 0.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1900993.html",
       "coreCpi": -0.3,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896452.html",
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202102/t20210210_1813323.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202102/t20210210_1813323.html",
@@ -1551,8 +1555,8 @@
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202103/t20210310_1814577.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896457.html",
-          "status": "RuntimeError"
+          "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202103/t20210310_1814574.html",
+          "status": "core-not-found"
         }
       ],
       "coreCpi": 0,
@@ -1568,7 +1572,7 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896465.html",
-          "status": "RuntimeError"
+          "status": "core-not-found"
         }
       ],
       "coreCpi": 0.3,
@@ -1581,14 +1585,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901077.html",
       "ppi": 6.8,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901078.html",
+      "coreCpi": 0.7,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896482.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202105/t20210511_1817165.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.7,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896482.html",
       "scissors": 5.9
     },
     {
@@ -1597,14 +1601,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202106/t20210609_1818285.html",
       "ppi": 9,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901121.html",
+      "coreCpi": 0.9,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896497.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896497.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.9,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896497.html",
       "scissors": 7.7
     },
     {
@@ -1613,14 +1617,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901146.html",
       "ppi": 8.8,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202107/t20210709_1819236.html",
+      "coreCpi": 0.9,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896505.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896505.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.9,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896505.html",
       "scissors": 7.7
     },
     {
@@ -1629,14 +1633,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202108/t20210809_1820361.html",
       "ppi": 9,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901185.html",
+      "coreCpi": 1.3,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896523.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896523.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.3,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896523.html",
       "scissors": 8
     },
     {
@@ -1645,14 +1649,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901211.html",
       "ppi": 9.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901212.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896532.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202109/t20210909_1821862.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896532.html",
       "scissors": 8.7
     },
     {
@@ -1661,14 +1665,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202110/t20211014_1822887.html",
       "ppi": 10.7,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202110/t20211014_1822888.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202110/t20211014_1822883.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896541.html",
           "status": "core-not-found"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202110/t20211014_1822883.html",
       "scissors": 10
     },
     {
@@ -1677,14 +1681,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901272.html",
       "ppi": 13.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901273.html",
+      "coreCpi": 1.3,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896558.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202111/t20211110_1824280.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.3,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896558.html",
       "scissors": 12
     },
     {
@@ -1693,14 +1697,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901296.html",
       "ppi": 12.9,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901297.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202112/t20211209_1825145.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896567.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202112/t20211209_1825145.html",
       "scissors": 10.6
     },
     {
@@ -1709,14 +1713,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901328.html",
       "ppi": 10.3,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202201/t20220112_1826191.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896576.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896576.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896576.html",
       "scissors": 8.8
     },
     {
@@ -1725,14 +1729,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901367.html",
       "ppi": 9.1,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901368.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896595.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896595.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896595.html",
       "scissors": 8.2
     },
     {
@@ -1741,14 +1745,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901398.html",
       "ppi": 8.8,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901399.html",
+      "coreCpi": 1.1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896599.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896599.html",
           "status": "core-not-found"
         }
       ],
-      "coreCpi": 1.1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896599.html",
       "scissors": 7.9
     },
     {
@@ -1757,14 +1761,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901421.html",
       "ppi": 8.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901422.html",
+      "coreCpi": 1.1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896608.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896608.html",
           "status": "core-not-found"
         }
       ],
-      "coreCpi": 1.1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896608.html",
       "scissors": 6.8
     },
     {
@@ -1773,14 +1777,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202205/t20220511_1830359.html",
       "ppi": 8,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202205/t20220511_1830360.html",
+      "coreCpi": 0.9,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202205/t20220511_1830361.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202205/t20220511_1830361.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.9,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202205/t20220511_1830361.html",
       "scissors": 5.9
     },
     {
@@ -1789,14 +1793,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901482.html",
       "ppi": 6.4,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202206/t20220610_1858008.html",
+      "coreCpi": 0.9,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896633.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896633.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.9,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896633.html",
       "scissors": 4.3
     },
     {
@@ -1805,14 +1809,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901504.html",
       "ppi": 6.1,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901505.html",
+      "coreCpi": 1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896641.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896641.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896641.html",
       "scissors": 3.6
     },
     {
@@ -1821,14 +1825,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202208/t20220810_1887176.html",
       "ppi": 4.2,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901543.html",
+      "coreCpi": 0.8,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896658.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896658.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.8,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896658.html",
       "scissors": 1.5
     },
     {
@@ -1837,14 +1841,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202209/t20220909_1888086.html",
       "ppi": 2.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901571.html",
+      "coreCpi": 0.8,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896670.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896670.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.8,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896670.html",
       "scissors": -0.2
     },
     {
@@ -1853,14 +1857,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202210/t20221014_1889270.html",
       "ppi": 0.9,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901614.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896698.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896698.html",
           "status": "core-not-found"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896698.html",
       "scissors": -1.9
     },
     {
@@ -1869,14 +1873,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901647.html",
       "ppi": -1.3,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202211/t20221109_1890136.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896714.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896714.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896714.html",
       "scissors": -3.4
     },
     {
@@ -1885,14 +1889,14 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202212/t20221209_1890874.html",
       "ppi": -1.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901671.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896722.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896722.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896722.html",
       "scissors": -2.9
     },
     {
@@ -1901,14 +1905,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1901703.html",
       "ppi": -0.7,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202301/t20230112_1891604.html",
+      "coreCpi": 0.7,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202301/t20230112_1891605.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202301/t20230112_1891605.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.7,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202301/t20230112_1891605.html",
       "scissors": -2.5
     },
     {
@@ -1917,14 +1921,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230220_1913661.html",
       "ppi": -0.8,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202302/t20230220_1913662.html",
+      "coreCpi": 1,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202302/t20230210_1902656.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202302/t20230223_1918384.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202302/t20230223_1918384.html",
       "scissors": -2.9
     },
     {
@@ -1933,14 +1937,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202303/t20230309_1936952.html",
       "ppi": -1.4,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202303/t20230309_1936953.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202303/t20230309_1936955.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202303/t20230309_1936954.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202303/t20230309_1936954.html",
       "scissors": -2.4
     },
     {
@@ -1949,14 +1953,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202304/t20230411_1938507.html",
       "ppi": -2.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202304/t20230411_1938508.html",
+      "coreCpi": 0.7,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202304/t20230411_1938509.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202304/t20230411_1938509.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.7,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202304/t20230411_1938509.html",
       "scissors": -3.2
     },
     {
@@ -1965,14 +1969,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202305/t20230511_1939347.html",
       "ppi": -3.6,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202305/t20230511_1939348.html",
+      "coreCpi": 0.7,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202305/t20230511_1939357.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202305/t20230511_1939346.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.7,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202305/t20230511_1939346.html",
       "scissors": -3.7
     },
     {
@@ -1981,14 +1985,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202306/t20230609_1940479.html",
       "ppi": -4.6,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202306/t20230609_1940484.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202306/t20230609_1940481.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202306/t20230609_1940482.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202306/t20230609_1940481.html",
       "scissors": -4.8
     },
     {
@@ -1999,8 +2003,8 @@
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202307/t20230710_1941148.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202307/t20230710_1941149.html",
-          "status": "RuntimeError"
+          "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202307/t20230710_1941156.html",
+          "status": "core-not-found"
         }
       ],
       "scissors": -5.4,
@@ -2013,14 +2017,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202308/t20230809_1941863.html",
       "ppi": -4.4,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202308/t20230809_1941868.html",
+      "coreCpi": 0.8,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202308/t20230809_1941866.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202308/t20230809_1941865.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.8,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202308/t20230809_1941865.html",
       "scissors": -4.1
     },
     {
@@ -2029,18 +2033,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202309/t20230909_1942695.html",
       "ppi": -3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202309/t20230909_1942696.html",
-      "auditNotes": [
-        {
-          "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202309/t20230909_1942701.html",
-          "status": "RuntimeError"
-        },
-        {
-          "source": "https://www.stats.gov.cn/hd/lyzx/zxgk/202405/t20240524_1953975.html",
-          "status": "RuntimeError"
-        }
-      ],
       "coreCpi": 0.8,
       "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202309/t20230909_1942694.html",
+      "auditNotes": [
+        {
+          "source": "https://www.stats.gov.cn/hd/lyzx/zxgk/202405/t20240524_1953975.html",
+          "status": "core-not-found"
+        }
+      ],
       "scissors": -3.1
     },
     {
@@ -2049,24 +2049,24 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202310/t20231013_1943556.html",
       "ppi": -2.5,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202310/t20231013_1943554.html",
+      "coreCpi": 0.8,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202310/t20231013_1943551.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202310/t20231013_1943551.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.8,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202310/t20231013_1943551.html",
       "scissors": -2.5
     },
     {
       "period": "2023-10",
       "cpi": -0.2,
-      "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202311/t20231109_1944387.html",
+      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202311/t20231109_1944382.html",
       "ppi": -2.6,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202311/t20231109_1944383.html",
       "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202311/t20231109_1944384.html",
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202311/t20231109_1944389.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202311/t20231109_1944384.html",
@@ -2081,34 +2081,36 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202312/t20231209_1945394.html",
       "ppi": -3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202312/t20231209_1945395.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202312/t20231209_1945401.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202312/t20231209_1945396.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202312/t20231209_1945401.html",
       "scissors": -2.5
     },
     {
       "period": "2023-12",
       "cpi": -0.3,
-      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202401/t20240112_1946465.html",
+      "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202401/t20240112_1946471.html",
       "ppi": -2.7,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202401/t20240112_1946466.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202401/t20240112_1946467.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202401/t20240112_1946467.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202401/t20240112_1946467.html",
       "scissors": -2.4
     },
     {
       "period": "2024-01",
+      "coreCpi": 0.4,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202402/t20240208_1947626.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202402/t20240208_1947626.html",
@@ -2119,8 +2121,6 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202402/t20240208_1947623.html",
       "ppi": -2.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202402/t20240208_1947624.html",
-      "coreCpi": 0.4,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfb/202402/t20240208_1947625.html",
       "scissors": -1.7
     },
     {
@@ -2129,14 +2129,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202403/t20240309_1948279.html",
       "ppi": -2.7,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202403/t20240321_1948095.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202403/t20240318_1947993.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202403/t20240318_1947993.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202403/t20240318_1947993.html",
       "scissors": -3.4
     },
     {
@@ -2145,25 +2145,23 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202404/t20240411_1948448.html",
       "ppi": -2.8,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202404/t20240411_1948465.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202404/t20240411_1948497.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202404/t20240411_1948497.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202404/t20240411_1948497.html",
       "scissors": -2.9
     },
     {
       "period": "2024-04",
       "cpi": 0.3,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202405/t20240511_1950302.html",
+      "coreCpi": 0.7,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202405/t20240511_1950306.html",
       "auditNotes": [
-        {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202405/t20240511_1950306.html",
-          "status": "RuntimeError"
-        },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202405/t20240511_1950304.html",
           "status": "value-not-found"
@@ -2171,52 +2169,44 @@
       ],
       "ppi": -2.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202405/t20240511_1950304.html",
-      "coreCpi": 0.7,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202405/t20240511_1950306.html",
       "scissors": -2.8
     },
     {
       "period": "2024-05",
       "cpi": 0.3,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202406/t20240612_1954519.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202406/t20240612_1954521.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202406/t20240612_1954521.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202406/t20240612_1954520.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -1.4,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202406/t20240612_1954520.html",
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202406/t20240612_1954521.html",
       "scissors": -1.7
     },
     {
       "period": "2024-06",
       "cpi": 0.2,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202407/t20240710_1955508.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202407/t20240710_1955510.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202407/t20240710_1955510.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/sj/zxfb/202407/t20240710_1955509.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -0.8,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202407/t20240710_1955509.html",
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202407/t20240710_1955510.html",
       "scissors": -1
     },
     {
       "period": "2024-07",
+      "coreCpi": 0.4,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202408/t20240809_1955950.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202408/t20240809_1955950.html",
@@ -2227,8 +2217,6 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202408/t20240809_1955948.html",
       "ppi": -0.8,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202408/t20240809_1955986.html",
-      "coreCpi": 0.4,
-      "coreCpiUrl": "https://www.stats.gov.cn/zwfwck/sjfb/202408/t20240809_1955950.html",
       "scissors": -1.3
     },
     {
@@ -2240,7 +2228,7 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202409/t20240909_1956309.html",
-          "status": "RuntimeError"
+          "status": "core-not-found"
         }
       ],
       "scissors": -2.4,
@@ -2250,15 +2238,15 @@
     {
       "period": "2024-09",
       "cpi": 0.4,
-      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202410/t20241013_1956899.html",
+      "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202410/t20241013_1956899.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202410/t20241013_1956897.html",
-          "status": "RuntimeError"
+          "status": "core-not-found"
         },
         {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202410/t20241013_1956898.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.8,
@@ -2271,6 +2259,8 @@
       "period": "2024-10",
       "cpi": 0.3,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202411/t20241109_1957353.html",
+      "coreCpi": 0.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202411/t20241109_1957351.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202411/t20241109_1957351.html",
@@ -2279,48 +2269,38 @@
       ],
       "ppi": -2.9,
       "ppiUrl": "https://www.stats.gov.cn/zwfwck/sjfb/202411/t20241109_1957352.html",
-      "coreCpi": 0.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202411/t20241115_1957470.html",
       "scissors": -3.2
     },
     {
       "period": "2024-11",
       "cpi": 0.2,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202412/t20241209_1957689.html",
+      "coreCpi": 0.3,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202412/t20241209_1957687.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202412/t20241209_1957687.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202412/t20241209_1957688.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.5,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202412/t20241209_1957688.html",
-      "coreCpi": 0.3,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202412/t20241216_1957773.html",
       "scissors": -2.7
     },
     {
       "period": "2024-12",
       "cpi": 0.1,
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202501/t20250109_1958170.html",
+      "coreCpi": 0.4,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202501/t20250109_1958168.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202501/t20250109_1958168.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/sj/zxfb/202501/t20250109_1958169.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.3,
       "ppiUrl": "https://www.stats.gov.cn/zwfwck/sjfb/202501/t20250109_1958169.html",
-      "coreCpi": 0.4,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202501/t20250117_1958346.html",
       "scissors": -2.4
     },
     {
@@ -2329,14 +2309,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202502/t20250209_1958646.html",
       "ppi": -2.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202502/t20250209_1958645.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202502/t20250209_1958644.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202502/t20250209_1958644.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202502/t20250209_1958644.html",
       "scissors": -2.8
     },
     {
@@ -2346,11 +2326,11 @@
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202503/t20250309_1958913.html",
-          "status": "RuntimeError"
+          "status": "core-not-found"
         },
         {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202503/t20250309_1958914.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.2,
@@ -2362,17 +2342,17 @@
     {
       "period": "2025-03",
       "cpi": -0.1,
-      "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202504/t20250410_1959261.html",
+      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202504/t20250410_1959261.html",
       "ppi": -2.5,
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202504/t20250410_1959260.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202504/t20250410_1959259.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202504/t20250410_1959259.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202504/t20250410_1959259.html",
       "scissors": -2.4
     },
     {
@@ -2381,14 +2361,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202505/t20250510_1959771.html",
       "ppi": -2.7,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202505/t20250510_1959770.html",
+      "coreCpi": 0.5,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202505/t20250510_1959769.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202505/t20250510_1959769.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.5,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202505/t20250510_1959769.html",
       "scissors": -2.6
     },
     {
@@ -2397,14 +2377,14 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202506/t20250609_1960094.html",
       "ppi": -3.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202506/t20250609_1960093.html",
+      "coreCpi": 0.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202506/t20250609_1960092.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202506/t20250609_1960092.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.6,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202506/t20250609_1960092.html",
       "scissors": -3.2
     },
     {
@@ -2413,20 +2393,22 @@
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202507/t20250709_1960370.html",
       "ppi": -3.6,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202507/t20250709_1960367.html",
+      "coreCpi": -3.6,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202507/t20250709_1960365.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/zxfbhjd/202507/t20250709_1960365.html",
           "status": "RuntimeError"
         }
       ],
-      "coreCpi": 0.7,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfb/202507/t20250715_1960414.html",
       "scissors": -3.7
     },
     {
       "period": "2025-07",
       "cpi": 0,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202508/t20250809_1960635.html",
+      "coreCpi": 0.8,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202508/t20250809_1960633.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202508/t20250809_1960633.html",
@@ -2435,74 +2417,62 @@
       ],
       "ppi": -3.6,
       "ppiUrl": "https://www.stats.gov.cn/sj/sjjd/202508/t20250809_1960633.html",
-      "coreCpi": 0.8,
-      "coreCpiUrl": "https://www.stats.gov.cn/zs/tjwh/tjkw/tjqk/zgxxb/202508/P020250818329475224130.pdf",
       "scissors": -3.6
     },
     {
       "period": "2025-08",
       "cpi": -0.4,
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202509/t20250910_1961112.html",
+      "coreCpi": 0.9,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202509/t20250910_1961105.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202509/t20250910_1961105.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202509/t20250910_1961108.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.9,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202509/t20250910_1961108.html",
-      "coreCpi": 0.9,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202509/t20250910_1961105.html",
       "scissors": -2.5
     },
     {
       "period": "2025-09",
       "cpi": -0.3,
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202510/t20251015_1961521.html",
+      "coreCpi": 1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202510/t20251015_1961519.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202510/t20251015_1961519.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/sj/zxfb/202510/t20251015_1961520.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.3,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202510/t20251015_1961520.html",
-      "coreCpi": 1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202510/t20251015_1961519.html",
       "scissors": -2
     },
     {
       "period": "2025-10",
       "cpi": 0.2,
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202511/t20251109_1961826.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202511/t20251109_1961821.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202511/t20251109_1961821.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202511/t20251109_1961822.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -2.1,
       "ppiUrl": "https://www.stats.gov.cn/zs/tjwh/tjkw/tjqk/zgxxb/202511/P020251111320050348958.pdf",
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202511/t20251109_1961821.html",
       "scissors": -2.3
     },
     {
       "period": "2025-11",
       "cpi": 0.7,
       "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202512/t20251210_1962015.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202512/t20251210_1962013.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/sj/sjjd/202512/t20251210_1962013.html",
@@ -2511,28 +2481,22 @@
       ],
       "ppi": -2.2,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202512/t20251210_1962014.html",
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202512/t20251210_1962013.html",
       "scissors": -2.9
     },
     {
       "period": "2025-12",
       "cpi": 0.8,
-      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202601/t20260109_1962273.html",
+      "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202601/t20260109_1962273.html",
+      "coreCpi": 1.2,
+      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202601/t20260109_1962271.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202601/t20260109_1962271.html",
-          "status": "RuntimeError"
-        },
-        {
           "source": "https://www.stats.gov.cn/sj/zxfb/202601/t20260109_1962272.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -1.9,
       "ppiUrl": "https://www.stats.gov.cn/zs/tjwh/tjkw/tjqk/zgxxb/202601/P020260112309892559292.pdf",
-      "coreCpi": 1.2,
-      "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202601/t20260119_1962341.html",
       "scissors": -2.7
     },
     {
@@ -2546,7 +2510,7 @@
         },
         {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202602/t20260211_1962587.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ],
       "ppi": -1.4,
@@ -2558,15 +2522,15 @@
     {
       "period": "2026-02",
       "cpi": 1.3,
-      "cpiUrl": "https://www.stats.gov.cn/sj/zxfb/202603/t20260309_1962732.html",
+      "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202603/t20260309_1962732.html",
       "auditNotes": [
         {
           "source": "https://www.stats.gov.cn/xxgk/zftjdcxmsp/bmtjdcxm/202605/t20260507_1963629.html",
           "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202603/t20260309_1962729.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260309_1962729.html",
+          "status": "RuntimeError"
         }
       ],
       "ppi": -0.9,
@@ -2586,15 +2550,15 @@
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202604/t20260416_1963324.html",
-          "status": "core-not-found"
+          "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202604/t20260416_1963320.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202604/t20260416_1963320.html",
+          "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202604/t20260410_1963263.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfb/202604/t20260410_1963263.html",
+          "status": "RuntimeError"
         }
       ],
       "ppi": 0.5,
@@ -2611,8 +2575,8 @@
       "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202605/t20260511_1963658.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202605/t20260511_1963657.html",
-          "status": "core-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260511_1963657.html",
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/fw/bmdcxmsp/bmdcspgg/202607/t20260729_1964207.html",
@@ -2624,15 +2588,19 @@
         },
         {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202605/t20260511_1963658.html",
+          "status": "RuntimeError"
+        },
+        {
+          "source": "https://www.stats.gov.cn/sj/zxfb/202605/t20260518_1963715.html",
           "status": "value-not-found"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260518_1963715.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfb/202605/t20260506_1963594.html",
+          "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202604/t20260424_1963388.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202604/t20260424_1963388.html",
+          "status": "RuntimeError"
         }
       ],
       "coreCpi": 1.2,
@@ -2644,12 +2612,10 @@
       "cpi": 1.2,
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202606/t20260610_1963923.html",
       "ppi": 3.9,
-      "ppiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202606/t20260610_1963922.html",
+      "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202606/t20260610_1963922.html",
+      "coreCpi": 1.1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202606/t20260610_1963924.html",
       "auditNotes": [
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202606/t20260610_1963924.html",
-          "status": "RuntimeError"
-        },
         {
           "source": "https://www.stats.gov.cn/fw/bmdcxmsp/bmdcspgg/202607/t20260729_1964208.html",
           "status": "RuntimeError"
@@ -2657,30 +2623,8 @@
         {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202606/t20260616_1963948.html",
           "status": "RuntimeError"
-        },
-        {
-          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202606/t20260610_1963922.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202606/t20260616_1963946.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202606/t20260603_1963874.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202605/t20260522_1963786.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202605/t20260514_1963691.html",
-          "status": "value-not-found"
         }
       ],
-      "coreCpi": 1.1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/sjjd/202606/t20260610_1963924.html",
       "scissors": 2.7
     },
     {
@@ -2689,42 +2633,18 @@
       "cpiUrl": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202607/t20260709_1964084.html",
       "ppi": 4.1,
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202607/t20260709_1964083.html",
+      "coreCpi": 1,
+      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202607/t20260709_1964082.html",
       "auditNotes": [
-        {
-          "source": "https://www.stats.gov.cn/sj/sjjd/202607/t20260709_1964082.html",
-          "status": "RuntimeError"
-        },
         {
           "source": "https://www.stats.gov.cn/xxgk/zftjdcxmsp/bmtjdcxm/202607/t20260729_1964214.html",
           "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202607/t20260715_1964128.html",
+          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202607/t20260715_1964128.html",
           "status": "RuntimeError"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202607/t20260709_1964083.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202607/t20260715_1964115.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202607/t20260703_1964057.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202606/t20260623_1963989.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202606/t20260612_1963938.html",
-          "status": "value-not-found"
         }
       ],
-      "coreCpi": 1,
-      "coreCpiUrl": "https://www.stats.gov.cn/sj/zxfbhjd/202607/t20260709_1964082.html",
       "scissors": 3.1
     },
     {
@@ -2737,7 +2657,7 @@
       "coreCpiUrl": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202608/t20260809_1965009.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965051.html",
+          "source": "https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965051.html",
           "status": "RuntimeError"
         }
       ],
@@ -2751,32 +2671,28 @@
       "ppiUrl": "https://www.stats.gov.cn/sj/zxfb/202609/t20260909_1965262.html",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/xxgk/jd/sjjd2020/202609/t20260909_1965261.html",
-          "status": "core-not-found"
+          "source": "https://www.stats.gov.cn/sj/sjjd/202609/t20260909_1965261.html",
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965312.html",
           "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202608/t20260831_1965154.html",
+          "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260909_1965262.html",
           "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260909_1965262.html",
-          "status": "value-not-found"
-        },
-        {
           "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965304.html",
-          "status": "value-not-found"
-        },
-        {
-          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202608/t20260813_1965025.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202608/t20260821_1965093.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
+        },
+        {
+          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202608/t20260813_1965025.html",
+          "status": "RuntimeError"
         }
       ],
       "coreCpi": 1,
@@ -2787,20 +2703,20 @@
       "period": "2026-09",
       "auditNotes": [
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260930_1965449.html",
+          "source": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202609/t20260930_1965449.html",
           "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202610/t20261008_1965465.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202610/t20261008_1965465.html",
+          "status": "RuntimeError"
         },
         {
-          "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260923_1965403.html",
-          "status": "value-not-found"
+          "source": "https://www.stats.gov.cn/sj/zxfbhjd/202609/t20260923_1965403.html",
+          "status": "RuntimeError"
         },
         {
           "source": "https://www.stats.gov.cn/sj/zxfb/202609/t20260914_1965293.html",
-          "status": "value-not-found"
+          "status": "RuntimeError"
         }
       ]
     }
