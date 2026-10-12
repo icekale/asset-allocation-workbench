@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Loopback-only helper for the portal (workerd cannot touch app/data). Bearer token required.
-// GET /draft · POST /publish · POST /discard. Publishing runs AAW_REBUILD_CMD (detached) afterwards.
+// GET /draft · POST /publish · POST /discard · POST /decide (confirm/edit/keep a judgement suggestion). Publishing runs AAW_REBUILD_CMD (detached) afterwards.
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { execFile, spawn } from "node:child_process";
+import { JUDGEMENT_IDS } from "../lib/macro-rating-suggest.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const token = process.env.AAW_RATING_TOKEN || "";
@@ -20,6 +21,35 @@ http.createServer(async (req, res) => {
     const file = path.join(root, "app/data/macro-rating-draft.json");
     if (!fs.existsSync(file)) return send(404, { draft: null });
     return send(200, { draft: JSON.parse(fs.readFileSync(file, "utf8")) });
+  }
+  if (req.method === "POST" && req.url === "/decide") {
+    if (busy) return send(409, { error: "正在处理，请稍候" });
+    let raw = "";
+    for await (const chunk of req) { raw += chunk; if (raw.length > 8192) return send(413, { error: "请求过大" }); }
+    let body;
+    try { body = JSON.parse(raw); } catch { return send(400, { error: "格式错误" }); }
+    const { id, action, key } = body || {};
+    const value = body?.value === undefined || body?.value === null || body?.value === "" ? null : Number(body.value);
+    const note = typeof body?.note === "string" ? body.note.trim().slice(0, 500) : "";
+    if (!JUDGEMENT_IDS.includes(id) || !["confirm", "edit", "keep"].includes(action) || typeof key !== "string") return send(400, { error: "参数无效" });
+    if (action === "edit" && (!Number.isFinite(value) || !note)) return send(400, { error: "改档须填写分值与理由" });
+    const draftFile = path.join(root, "app/data/macro-rating-draft.json");
+    const draft = fs.existsSync(draftFile) ? JSON.parse(fs.readFileSync(draftFile, "utf8")) : null;
+    const row = draft?.rows?.find((r) => r.id === id);
+    if (!row?.suggestion || row.suggestion.key !== key) return send(409, { error: "建议已更新，请刷新页面后再操作" });
+    busy = true;
+    try {
+      const file = path.join(root, "app/data/macro-rating-confirmations.json");
+      const log = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")) : { kind: "macro-rating-confirmations", note: "追加记录；草稿只采用与当前建议key一致的最新一条。", entries: [] };
+      log.entries.push({ id, action, key, value: action === "edit" ? value : null, note: note || null, period: row.suggestion.period,
+        suggestedValue: row.suggestion.suggestedValue, at: new Date().toISOString(), by: "portal" });
+      fs.writeFileSync(file + ".tmp", JSON.stringify(log, null, 1) + "\n");
+      fs.renameSync(file + ".tmp", file);
+      const out = await run("build");
+      if (!out.ok) return send(500, { error: "已记录，但草稿重建失败：" + (out.stderr.slice(-300) || "") });
+      const fresh = JSON.parse(fs.readFileSync(draftFile, "utf8")).rows.find((r) => r.id === id);
+      return send(200, { ok: true, source: fresh.source, decision: fresh.decision });
+    } finally { busy = false; }
   }
   if (req.method === "POST" && ["/publish", "/discard"].includes(req.url)) {
     if (busy) return send(409, { error: "正在处理，请稍候" });

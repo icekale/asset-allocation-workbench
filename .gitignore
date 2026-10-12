@@ -65,3 +65,5 @@ __pycache__/
 /.rating-sidecar.env
 /app/data/macro-rating-evidence.json
 /output/rating-evidence-cache/
+/app/data/macro-rating-judgement-evidence.json
+/app/data/macro-rating-confirmations.json
