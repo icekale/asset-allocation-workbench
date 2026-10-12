@@ -3,7 +3,7 @@
 // build writes app/data/macro-rating-draft.json only; publish appends history + updates current (manual action).
 import fs from "node:fs";
 import path from "node:path";
-import { buildDraft, publishDraft, reproduceSnapshot, rulesHash } from "../lib/macro-rating-draft.mjs";
+import { loadDraftData, buildDraft, publishDraft, reproduceSnapshot, rulesHash } from "../lib/macro-rating-draft.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const p = (rel) => path.join(root, rel);
@@ -29,7 +29,8 @@ if (cmd === "lock") {
   console.log(JSON.stringify({ snapshot: snap.id, ...res }, null, 2));
   process.exit(res.ok ? 0 : 1);
 } else if (cmd === "build") {
-  const data = { prices: read("app/data/macro-price-history.json"), money: read("app/data/macro-money-supply.json") };
+  const loaded = loadDraftData(read);
+  const data = { ...loaded.data, ev: loaded.ev };
   const draft = buildDraft({ framework: read(F.framework), current: read(F.current), lock: read(F.lock), data, asOf: arg("as-of") || today() });
   writeAtomic(F.draft, draft);
   fs.mkdirSync(p("output"), { recursive: true });

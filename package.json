@@ -31,7 +31,7 @@
     "stale:check": "node --experimental-strip-types scripts/stale-check.mjs",
     "rating:verify": "node scripts/macro-rating-draft.mjs verify",
     "rating:draft": "node scripts/macro-rating-draft.mjs build",
-    "test:rating-draft": "node --test tests/macro-rating-draft.test.mjs"
+    "test:rating-draft": "node --test tests/macro-rating-draft.test.mjs tests/macro-rating-builders.test.mjs"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",
