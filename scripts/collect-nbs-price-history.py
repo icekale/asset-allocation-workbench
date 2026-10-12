@@ -257,10 +257,14 @@ def collect(start_year: int, end_year: int) -> dict:
                 rows[period]["coreCpi"] = value
                 rows[period]["coreCpiUrl"] = url
 
+    ordered_rows = [rows[period] for period in sorted(rows)]
+    latest_core = next((row["period"] for row in reversed(ordered_rows) if row.get("coreCpi") is not None), None)
     return {
         "description": "国家统计局原始月度发布及CPI/PPI解读，当月同比，单位%；缺失不插值",
         "sourcePriority": "official-original-release",
-        "rows": [rows[period] for period in sorted(rows)],
+        "latestPeriod": ordered_rows[-1]["period"] if ordered_rows else None,
+        "latestCorePeriod": latest_core,
+        "rows": ordered_rows,
     }
 
 
@@ -271,6 +275,15 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     result = collect(args.start_year, args.end_year)
+    # 定时抓取会整体重写该文件：先继承旧文件中本脚本不产出的说明字段
+    # （basis、seriesNotes 等），避免覆盖时丢掉口径与来源注释。
+    if args.output.exists():
+        try:
+            previous = json.loads(args.output.read_text())
+        except (json.JSONDecodeError, OSError):
+            previous = None
+        if isinstance(previous, dict):
+            result = {**previous, **result}
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print("saved", args.output, "rows", len(result["rows"]))
 

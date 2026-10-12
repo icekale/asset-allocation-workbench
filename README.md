@@ -47,3 +47,12 @@ bash scripts/deploy-cloudflare.sh
 宏观及金融数据按“官方原始发布 → 万得 Wind → 财新数据 API”的顺序获取与核验。记录统计期、单位、口径和来源；无法可靠核验的点保留为空。
 
 评分记录默认全部保留。更新通过 `appendMacroRatingRecord` 向当前 `app/data/macro-rating-history.json` 追加独立快照，拒绝重复截止日及版本。只有用户明确指定时才删除记录，并先保留可恢复备份。完整维护要求见 `AGENTS.md`。
+
+## 自动更新
+
+- 上证指数收盘行情：Cloudflare Cron 在工作日北京时间 15:10 触发 Worker `scheduled`，三源交叉核验（腾讯/新浪/东方财富，偏差上限 0.2%）后写入 D1；本机 LaunchAgent 15:20 兜底。
+- 官方宏观序列：本机 LaunchAgent 每月 16 日、26 日运行 `scripts/refresh-official-macro.mjs`，只抓取与比对，结构不兼容时自动回滚并留下待人工合并的副本。
+- 指数抓取单测：`npm run test:automation`；安装定时任务：`npm run launchd:install`。
+- 数据新鲜度：`/api/health` 返回 `asOf`、`ageHours`、`stale`，可直接接入监控。
+
+自动化设计、验证命令与失败处理见 [`docs/AUTOMATION.md`](docs/AUTOMATION.md)。

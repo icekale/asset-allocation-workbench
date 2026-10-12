@@ -106,6 +106,15 @@ def current(snapshot: Path | None = None) -> dict[str, dict]:
     return output
 
 
+def previous_latest_period(path: Path) -> str | None:
+    """现有文件的最后一条期间；官方发布有延迟，用它做"不许倒退"的守卫。"""
+    try:
+        rows = json.loads(path.read_text())["rows"]
+    except (OSError, KeyError, ValueError):
+        return None
+    return rows[-1]["period"] if rows else None
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
@@ -115,9 +124,14 @@ def main() -> None:
     current_rows = current(args.sdds_file)
     rows = [*historical_rows.values(), *current_rows.values()]
     rows.sort(key=lambda row: row["period"])
-    assert rows[0]["period"] == "2001-Q1"
-    assert rows[-1]["period"] == "2026-Q2"
-    assert len(rows) == 102
+    # 定时抓取会随官方发布推进：首期固定、长度不减，末期只要求不早于现有文件
+    # （季度数据发布时间本身有延迟，硬编码季度会误报失败）。
+    assert rows[0]["period"] == "2001-Q1", f"序列起始期异常：{rows[0]['period']}"
+    assert len(rows) >= 102, f"序列长度异常：{len(rows)}"
+    existing_latest = previous_latest_period(args.output)
+    assert existing_latest is None or rows[-1]["period"] >= existing_latest, (
+        f"新序列末期 {rows[-1]['period']} 早于现有文件 {existing_latest}"
+    )
     result = {
         "metric": "GDP 平减指数",
         "basis": "单季同比，按同版现价GDP单季值和实际GDP单季同比指数计算",

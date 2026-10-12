@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 官方原始数据（统计局/人民银行/海关总署）定时抓取：只抓取与比对，不发布；
+     有结构不兼容或采集失败时弹桌面通知。需要全自动发布时把 --deploy 加到参数里。
+     安装：bash scripts/install-launchd.sh -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.asset-allocation.official-macro</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>/ABSOLUTE/PATH/TO/node /ABSOLUTE/PATH/TO/scripts/refresh-official-macro.mjs</string>
+  </array>
+  <key>WorkingDirectory</key><string>/ABSOLUTE/PATH/TO/asset-allocation-protected-site</string>
+  <key>EnvironmentVariables</key>
+  <dict><key>PYTHON</key><string>/ABSOLUTE/PATH/TO/python3</string></dict>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Day</key><integer>16</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>40</integer></dict>
+    <dict><key>Day</key><integer>26</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>40</integer></dict>
+  </array>
+  <key>StandardOutPath</key><string>/tmp/asset-allocation-official-macro.out.log</string>
+  <key>StandardErrorPath</key><string>/tmp/asset-allocation-official-macro.err.log</string>
+</dict>
+</plist>

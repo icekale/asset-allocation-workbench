@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 指数行情本地兜底：线上 Cron 已按同一交易日幂等写库，本地再跑一次不会产生重复版本。
+     安装：bash scripts/install-launchd.sh -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.asset-allocation.index-refresh</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>/ABSOLUTE/PATH/TO/node --experimental-strip-types /ABSOLUTE/PATH/TO/scripts/refresh-index.mjs --publish</string>
+  </array>
+  <key>WorkingDirectory</key><string>/ABSOLUTE/PATH/TO/asset-allocation-protected-site</string>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>15</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>15</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>15</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>15</integer><key>Minute</key><integer>20</integer></dict>
+    <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>15</integer><key>Minute</key><integer>20</integer></dict>
+  </array>
+  <key>StandardOutPath</key><string>/tmp/asset-allocation-index-refresh.out.log</string>
+  <key>StandardErrorPath</key><string>/tmp/asset-allocation-index-refresh.err.log</string>
+</dict>
+</plist>

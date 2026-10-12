@@ -20,6 +20,11 @@
     "macro:consumer-confidence:refresh": "node --experimental-strip-types scripts/refresh-consumer-confidence.mjs --apply",
     "wind:sync": "node --experimental-strip-types scripts/wind-sync.mjs",
     "wind:index:sync": "node --experimental-strip-types scripts/sync-wind-index.mjs",
+    "index:check": "node --experimental-strip-types scripts/fetch-shanghai-index.mjs",
+    "index:refresh": "node --experimental-strip-types scripts/refresh-index.mjs",
+    "macro:official:refresh": "node scripts/refresh-official-macro.mjs",
+    "launchd:install": "bash scripts/install-launchd.sh",
+    "test:automation": "node --experimental-strip-types --test tests/index-quote.test.mjs tests/index-refresh.test.mjs",
     "test:providers": "node --experimental-strip-types --test tests/caixin-client.test.mjs tests/caixin-mapping.test.mjs tests/wind-provider.test.mjs tests/wind-mcp.test.mjs"
   },
   "dependencies": {

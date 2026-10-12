@@ -15,6 +15,11 @@
       "database_id": "d04dcbff-0db6-4dd2-99bd-e7d0d8e6964b"
     }
   ],
+  // Cron 使用 UTC：10 7 * * 1-5 = 北京时间工作日 15:10（收盘后 10 分钟）。
+  // 同一交易日重复触发不会产生新版本，行情日期未推进时自动跳过。
+  "triggers": {
+    "crons": ["10 7 * * 1-5"]
+  },
   "observability": {
     "enabled": true
   }

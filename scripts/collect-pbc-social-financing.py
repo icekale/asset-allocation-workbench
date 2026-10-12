@@ -119,7 +119,17 @@ data = {
     "coverageStart": rows[0]["period"],
     "coverageEnd": rows[-1]["period"],
 }
-(ROOT / "app/data/macro-social-financing.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+target = ROOT / "app/data/macro-social-financing.json"
+# 定时抓取会整体重写该文件：继承本脚本不产出的字段（flowComponents 等），
+# 否则会把人工/Wind 维护的构成项口径数据一并抹掉。
+if target.exists():
+    try:
+        previous = json.loads(target.read_text())
+    except (json.JSONDecodeError, OSError):
+        previous = None
+    if isinstance(previous, dict):
+        data = {**previous, **data}
+target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 periods = {row["period"] for row in rows}
 all_months = {f"{year}-{month:02d}" for year in range(2017, 2027) for month in range(1, 13) if f"{year}-{month:02d}" <= "2026-08"}
 missing = sorted(all_months - periods)

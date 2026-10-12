@@ -9,9 +9,11 @@ function database() {
   return binding;
 }
 
-async function ensureSchema() {
+let schemaReady: Promise<void> | undefined;
+
+function createSchema() {
   const db = database();
-  await db
+  return db
     .prepare(`
       CREATE TABLE IF NOT EXISTS dataset_versions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,10 +25,22 @@ async function ensureSchema() {
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
     `)
-    .run();
-  await db
-    .prepare("CREATE INDEX IF NOT EXISTS dataset_versions_collected_at_idx ON dataset_versions (collected_at DESC, id DESC)")
-    .run();
+    .run()
+    .then(() =>
+      db
+        .prepare("CREATE INDEX IF NOT EXISTS dataset_versions_collected_at_idx ON dataset_versions (collected_at DESC, id DESC)")
+        .run(),
+    )
+    .then(() => undefined);
+}
+
+/** 建表只做一次（每个 isolate 一次），避免每次读写都跑两遍 DDL。 */
+function ensureSchema() {
+  schemaReady ??= createSchema().catch((error: unknown) => {
+    schemaReady = undefined;
+    throw error;
+  });
+  return schemaReady;
 }
 
 function payloadString(payload: MarketInputPayload) {
@@ -82,13 +96,21 @@ export function validatePayload(value: unknown): asserts value is MarketInputPay
 export async function latestPayload(): Promise<MarketInputPayload> {
   try {
     await ensureSchema();
-    const row = await database()
-      .prepare("SELECT payload_json FROM dataset_versions ORDER BY collected_at DESC, id DESC LIMIT 1")
-      .first<{ payload_json: string }>();
-    if (!row) return seedPayload;
-    const payload = JSON.parse(row.payload_json) as MarketInputPayload;
-    validatePayload(payload);
-    return payload;
+    // 按自增 id 取最近写入的版本：collected_at 是各采集器写入的文本，
+    // 时区偏移格式不统一，字典序并不等于时间先后。
+    const rows = await database()
+      .prepare("SELECT payload_json FROM dataset_versions ORDER BY id DESC LIMIT 5")
+      .all<{ payload_json: string }>();
+    for (const row of rows.results ?? []) {
+      try {
+        const payload = JSON.parse(row.payload_json) as MarketInputPayload;
+        validatePayload(payload);
+        return payload;
+      } catch (error) {
+        console.error("Skipping unreadable dataset version", error);
+      }
+    }
+    return seedPayload;
   } catch (error) {
     console.error("Falling back to seed payload", error);
     return seedPayload;

@@ -2,15 +2,40 @@
 
 目标：更新网页所需的市场输入，并让访问者在 60 秒轮询周期内看到最新结果。任何分数必须可追溯；数据缺失时保留上一期分数或记 0，不允许猜测。
 
-## 每次运行
+## 自动化现状
 
-1. 从 `.collector.env` 读取 `SITE_URL` 与 `UPDATE_TOKEN`，不要在输出或提交中显示密钥。
-2. 运行 `node scripts/download-current.mjs` 读取上一期完整 payload，作为本次基线。
-3. 运行 `node scripts/fetch-shanghai-index.mjs`，更新上证指数、涨跌幅、观察时间与腾讯财经来源记录。
-4. 交易日更新 `asOf`、`collectedAt`。周末或节假日若没有新行情，保留最近完整交易日并只更新确有新证据的因子。
-5. 对到期因子采集最新证据：周度因子每周至少复核一次；月度因子只在官方月度数据发布后复核；事件因子仅在政策或重大事件发生时调整。
-6. 写入 `collector/latest-payload.json`，运行 `node scripts/validate-payload.mjs collector/latest-payload.json`；验证通过后运行 `node scripts/publish-data.mjs collector/latest-payload.json`。
-7. 原站回读核对通过后，运行 `node scripts/publish-data-cloudbase.mjs collector/latest-payload.json` 同步发布到国内 CloudBase。脚本必须以线上 `/api/health` 返回的数据指纹与本地 payload 一致为成功标准；若不一致，报告失败且不要把国内站点描述为已更新。
+| 数据 | 触发 | 入口 |
+| --- | --- | --- |
+| 上证指数收盘行情 | Cloudflare Cron，工作日北京时间 15:10（本地 LaunchAgent 15:20 兜底） | Worker `scheduled` → `lib/auto-refresh.ts`；本地 `scripts/refresh-index.mjs --publish` |
+| 官方宏观序列（统计局/人民银行/海关总署） | macOS LaunchAgent，每月 16 日、26 日 09:40 | `scripts/refresh-official-macro.mjs` |
+| Wind 宏观候选、财新序列候选 | 手工 | `scripts/refresh-wind-macro.mjs`、`scripts/caixin-sync.mjs` |
+| 19 项大类因子、6 项风格因子评分 | 手工研究后发布 | 见下文"人工复核" |
+
+自动化细节、验证命令与失败处理见 `docs/AUTOMATION.md`。
+
+## 指数行情（已自动）
+
+1. 抓取与交叉核验：腾讯财经、新浪财经、东方财富三源并发，两个及以上源成功时点位偏差必须 ≤ 0.2%，否则整体拒绝写入，线上保留上一期数据。
+2. 写入：只替换 `index`、`asOf`、`collectedAt`、来源记录与提示语；19 项大类因子、6 项风格因子、现仓和评分原样保留。同一交易日同一收盘点位不会重复入库。
+3. 手工核对（可选）：`node --experimental-strip-types scripts/fetch-shanghai-index.mjs` 只抓取不写入；
+   `node --experimental-strip-types scripts/refresh-index.mjs --baseline=collector/latest-payload.json --output=/tmp/payload.json`
+   可在不联网写库的前提下复核合并与校验结果。
+4. 节假日/周末行情源返回上一交易日快照，幂等判断会跳过，无需维护交易日历。
+
+## 官方宏观序列（自动抓取，默认人工确认发布）
+
+1. 运行 `PYTHON=/path/to/python3 node scripts/refresh-official-macro.mjs`（LaunchAgent 已按月触发）。第三方依赖见 `scripts/requirements.txt`；缺依赖的采集器会被跳过并在报告中说明，不计为抓取失败。
+2. 脚本运行前整目录备份 `app/data`，运行后逐文件比对：新结果若丢了原有顶层字段、`rows` 明显变短或不是合法 JSON，会自动回滚该文件并把采集结果留在 `output/official-macro-refresh/pending/`。
+3. 报告在 `output/official-macro-refresh/<时间戳>/report.md`。有 `pending/` 文件时人工合并后，再运行 `bash scripts/deploy-cloudflare.sh` 发布；加 `--deploy` 参数可在无失败、无 pending 时自动发布。
+
+## 人工复核（评分与 Wind/财新）
+
+1. 对到期因子采集最新证据：周度因子每周至少复核一次；月度因子只在官方月度数据发布后复核；事件因子仅在政策或重大事件发生时调整。
+2. Wind 与财新只产出候选：`node --experimental-strip-types scripts/refresh-wind-macro.mjs`、`node --experimental-strip-types scripts/caixin-sync.mjs`；映射、口径与单位确认后才写进 payload。
+3. 更新 payload：`node scripts/download-current.mjs` 取上一期基线，改完写回 `collector/latest-payload.json`，
+   运行 `node scripts/validate-payload.mjs collector/latest-payload.json`，通过后 `node scripts/publish-data.mjs collector/latest-payload.json`。
+4. 腾讯云旧镜像（`cloudbase-proxy/`）不是默认发布目标：只有用户明确要求同步国内镜像时才运行
+   `node scripts/publish-data-cloudbase.mjs collector/latest-payload.json`，并以线上 `/api/health` 的数据指纹一致为成功标准。
 
 ## 来源优先级
 

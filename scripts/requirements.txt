@@ -1,0 +1,10 @@
+# 官方宏观采集器的第三方依赖（其余采集器只用 Python 标准库）。
+# 安装（推荐用虚拟环境，避免污染系统 Python）：
+#   python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt
+# 然后在定时任务里用 PYTHON=/absolute/path/to/.venv/bin/python 指定解释器。
+#
+# 注意：collect-nbs-gdp-deflator.py 使用 pandas 的 flavor="lxml"，因此 lxml 必须保留；
+# pandas 3.x 已调整 read_html 的默认 flavor（默认需要 html5lib），升级 pandas 前请先跑一次该脚本。
+pandas>=2.0
+lxml>=5.0
+openpyxl>=3.1

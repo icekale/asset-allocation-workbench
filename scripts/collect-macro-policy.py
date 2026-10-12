@@ -191,6 +191,15 @@ def main():
     assert len(data["bond"]["rows"]) >= 100
     assert len(data["fiscal"]["rows"]) >= 7
     assert len(data["imfDeficit"]["rows"]) >= 20
+    # 定时抓取会整体重写该文件：继承本脚本不产出的字段（fundingRate、
+    # specialBondIssuance 等由其它来源维护的序列），避免覆盖时静默丢序列。
+    if OUTPUT.exists():
+        try:
+            previous = json.loads(OUTPUT.read_text())
+        except (json.JSONDecodeError, OSError):
+            previous = None
+        if isinstance(previous, dict):
+            data = {**previous, **data}
     OUTPUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
     print("LPR", len(data["lpr"]["rows"]), "bond", len(data["bond"]["rows"]), "fiscal", len(data["fiscal"]["rows"]), "IMF", len(data["imfDeficit"]["rows"]))
 
