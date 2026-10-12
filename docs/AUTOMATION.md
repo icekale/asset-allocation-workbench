@@ -117,6 +117,9 @@ bash scripts/install-launchd.sh
 
 # 或 cron（Linux 采集机，Asia/Shanghai）
 # 40 9 16,26 * * cd /path/to/repo && /path/to/node --experimental-strip-types scripts/collector-run.mjs --mode=apply >> /tmp/collector-run.log 2>&1
+
+# DMIT（179.255.150.134）本地门户：指数收盘写入 Miniflare D1，见 docs/DMIT_COLLECTOR.md
+# 10 15 * * 1-5 /root/bin/aaw-index-refresh.sh
 ```
 
 本机密钥放在被 gitignore 的 `.env.caixin`（或 `.env.local`），**不要**提交。
