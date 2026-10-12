@@ -737,7 +737,7 @@
     "unit": "亿元",
     "basis": "社会融资规模当月增量；流量值，正负方向均保留。数据接口返回缺少的月份不插值。",
     "sourceUrl": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "fetchedAt": "2026-10-08",
+    "fetchedAt": "2026-10-12",
     "coverageStart": "2020-01",
     "coverageEnd": "2026-04",
     "rows": [
