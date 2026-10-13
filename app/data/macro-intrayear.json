@@ -1,5 +1,5 @@
 {
-  "reviewedAt": "2026-10-05",
+  "reviewedAt": "2026-10-13",
   "note": "按指标库二级分类查看逐期走势；GDP 实际增速可切换单季实际同比与经季节调整的单季实际环比。制造业 PMI 新订单按月度指数观察，服务零售及投资结构按年初累计同比观察；不同频率和口径不拼线。",
   "activitySources": [
     { "period": "2026年1—2月", "url": "https://www.stats.gov.cn/zwfwck/sjfb/202603/t20260316_1962780.html" },
@@ -479,11 +479,19 @@
       "source": "国家统计局逐月采购经理指数月报", "sourceSet": "nonManufacturingPmi"
     },
     {
-      "metric": "消费者信心指数", "group": "经济运行", "subgroup": "景气指数", "role": "居民预期", "basis": "国家统计局月度指数，100为景气临界值；8月同口径值尚未核验", "unit": "点",
-      "periods": ["1月", "2月", "3月", "4月", "5月", "6月", "7月"],
-      "values": [90.6, 91.6, 90.0, 89.0, 89.9, 89.4, 89.2],
-      "source": "Wind EDB M0012303（原始来源：国家统计局；截至2026年7月）",
-      "url": "https://www.stats.gov.cn/zs/tjws/tjbk/202301/t20230101_1912948.html", "sourceLinkLabel": "查看官方指标定义 ↗"
+      "metric": "消费者信心指数",
+      "group": "经济运行",
+      "subgroup": "景气指数",
+      "role": "居民预期",
+      "basis": "国家统计局月度消费者信心指数，100为景气临界值；新增月份逐点核验后追加，历史点不改写",
+      "unit": "点",
+      "periods": ["1月","2月","3月","4月","5月","6月","7月","8月"],
+      "values": [90.6,91.6,90,89,89.9,89.4,89.2,89.5],
+      "source": "2026年1—7月 Wind EDB M0012303；新增月份 财新序列 5198401（原始来源：国家统计局；截至2026年8月）",
+      "url": "https://www.stats.gov.cn/zs/tjws/tjbk/202301/t20230101_1912948.html",
+      "sourceLinkLabel": "查看官方指标定义 ↗",
+      "observationSources": [{"period":"2026-08","value":89.5,"sourceId":"财新序列 5198401","source":"国家统计局","sourceUrl":null}],
+      "baselineYear": 2026
     },
     {
       "metric": "外汇储备", "group": "经济运行", "subgroup": "国际收支", "section": "外部收支", "basis": "月末美元余额；汇率折算及资产价格变化均会影响数值", "unit": "亿美元", "precision": 0,
