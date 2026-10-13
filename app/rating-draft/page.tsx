@@ -11,6 +11,7 @@ type Row = { id: string; name: string; pillar: string; weight: number; source: s
   suggestion?: Suggestion | null; decision?: Decision };
 type Draft = { generatedAt: string; asOf: string; baseVersion: string; baseAsOf: string; rulesVersion: string; policy: string; totalDelta: number | null;
   tierChanged: boolean; notable: boolean; counts: Record<string, number>;
+  evidenceSources?: { generatedAt: string | null; policyDocsByPublisher: Record<string, number>; localBondsLatest: string | null; policyFinanceReleases: number; cnbsLatest: string | null; toolTablesLatest: string | null; problems: number };
   before: { score: number | null; grade: string | null; pillars: Record<string, number | null> };
   after: { score: number | null; grade: string | null; status: string; pillars: Record<string, number | null> }; rows: Row[] };
 
@@ -39,6 +40,7 @@ export default async function RatingDraftPage() {
           </table>
           <h2>判断项建议（待确认）</h2>
           <p style={{ fontSize: 13, color: "#555" }}>以下为机器整理的证据与建议，未经确认不进入草稿（默认沿用上一版）。操作按时间追加记录；发布仍须单独点击“发布”。</p>
+          {draft.evidenceSources && <p style={{ fontSize: 13, color: "#555" }}>证据采集（{draft.evidenceSources.generatedAt ?? "—"}）：政策文件 {Object.entries(draft.evidenceSources.policyDocsByPublisher).map(([k, v]) => `${k} ${v}`).join("、") || "无"}；地方债月报至 {draft.evidenceSources.localBondsLatest ?? "—"}；政策性金融工具发布 {draft.evidenceSources.policyFinanceReleases} 篇；CNBS至 {draft.evidenceSources.cnbsLatest ?? "—"}；央行工具表至 {draft.evidenceSources.toolTablesLatest ?? "—"}；采集问题 {draft.evidenceSources.problems} 条。</p>}
           {draft.rows.filter((r) => r.suggestion).map((r) => <SuggestionCard key={r.id} s={r.suggestion as Suggestion} source={r.source} decision={r.decision ?? null} />)}
           <DraftActions canPublish={draft.after.status === "正式"} />
           <table style={{ borderCollapse: "collapse", width: "100%" }}>

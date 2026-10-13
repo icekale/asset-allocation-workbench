@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { buildDraft, rulesHash } from "../lib/macro-rating-draft.mjs";
 import { buildSuggestions, JUDGEMENT_IDS } from "../lib/macro-rating-suggest.mjs";
-import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy } from "../lib/macro-rating-judgement-parse.mjs";
+import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody } from "../lib/macro-rating-judgement-parse.mjs";
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
@@ -72,4 +72,16 @@ test("judgement parsers", () => {
   const r = parseLeverageReport("2026 年二季度宏观杠杆率下降 1.1 个百分点，从一季度的 309.3%下降至\n308.2%。其中，居民部门杠杆率下降 1.3 个百分点，从一季度的 59.0%下降至\n57.7%；非金融企业杠杆率下降 0.5 个百分点，从一季度的 180.0%下降至 179.5%；居民部门债务同比增长-1.3%，企业部门债务同比增长 7.8%", "2026年二季度宏观杠杆率报告");
   assert.deepEqual([r.period, r.household.value, r.corporate.value, r.householdDebtGrowth, r.corporateDebtGrowth], ["2026-Q2", 57.7, 179.5, -1.3, 7.8]);
   assert.deepEqual(classifyPolicy("关于进一步提高上市公司质量的意见"), ["capitalMarketInstitution"]);
+});
+
+test("special-bond, structural-tool and policy-finance parsers", () => {
+  const t = "2026年8月，全国发行新增地方政府债券6440亿元，其中一般债券1227亿元、专项债券5213亿元。全国发行再融资债券5505亿元，其中一般债券1798亿元、专项债券3707亿元。全国发行地方政府债券合计11945亿元，其中一般债券3025亿元、专项债券8920亿元。2026年1-8月，全国发行新增地方政府债券34957亿元，其中一般债券5664亿元、专项债券29293亿元。全国发行再融资债券43077亿元，其中一般债券13715亿元、专项债券29362亿元。截至2026年8月末，全国地方政府债务余额598955亿元。其中，一般债务179194亿元，专项债务419761亿元";
+  const r = parseLocalBondMonthly(t);
+  assert.deepEqual([r.period, r.month.newSpecial, r.ytd.newSpecial, r.balance.special], ["2026-08", 5213, 29293, 419761]);
+  const old = parseLocalBondMonthly("2025年11月，全国发行新增地方政府债券5338亿元，其中一般债券416亿元、专项债券4922亿元。全国发行再融资债券3789亿元，其中一般债券2346亿元、专项债券1443亿元。合计，全国发行地方政府债券9127亿元，其中一般债券2762亿元、专项债券6365亿元。");
+  assert.equal(old.month.specialTotal, 6365);
+  assert.equal(parseToolRows("抵押补充贷款（PSL） 0 14 -14 其他结构性货币政策工具 6016 6580 -564").psl.netInjection, -14);
+  const f = extractPolicyFinanceFacts("首页|登录|8000亿元新型政策性金融工具资金加快投放|国开新型政策性金融工具已投放资金608.5亿元，支持项目153个。无关句子。");
+  assert.deepEqual(f.map((x) => x.amounts), [[8000], [608.5]]);
+  assert.deepEqual(classifyBody("上市公司分红…上市公司回购…资本市场"), ["capitalMarketInstitution"]);
 });
