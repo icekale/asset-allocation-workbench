@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import * as P from "../lib/rating-evidence-parse.mjs";
-import { classifyPolicy, classifyBody, parseLeverageReport, parseToolTable, parseToolRows, parseRrrNotice, parseLocalBondMonthly, extractPolicyFinanceFacts } from "../lib/macro-rating-judgement-parse.mjs";
+import { classifyPolicy, classifyBody, parseLeverageReport, parseToolTable, parseToolRows, parseRrrNotice, parseLocalBondMonthly, extractPolicyFinanceFacts, parseAnnualTargets, parseNewsList, attachmentLinks } from "../lib/macro-rating-judgement-parse.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const arg = (n, d) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=")[1] ?? d;
@@ -22,6 +22,34 @@ function get(url, { cache = false, min = 500 } = {}) {
     } catch { /* retry */ }
   }
   return null;
+}
+
+// Headless browser fallback for JS-gated public pages (DMIT: /opt/aaw-browser). Low rate; no captcha/login handling.
+let browserCalls = 0;
+function browserGet(url) {
+  const file = key("browser_" + url);
+  if (fs.existsSync(file) && Date.now() - fs.statSync(file).mtimeMs < 20 * 3600e3) return fs.readFileSync(file, "utf8");
+  if (browserCalls >= Number(arg("browserLimit", 25))) return null;
+  browserCalls += 1;
+  try {
+    execFileSync("sleep", ["2"]);
+    const html = execFileSync(process.execPath, [path.join(root, "scripts/browser-fetch.mjs"), url, "3500"], { maxBuffer: 64 << 20, timeout: 120000, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
+    if (/<!-- status:(200|304)/.test(html.slice(0, 200)) && html.length > 3000) { fs.writeFileSync(file, html); return html; }
+  } catch { /* unavailable or blocked */ }
+  return null;
+}
+const fetchAny = (url) => get(url, { cache: true }) || browserGet(url);
+// Attachment text (PDF/DOC/DOCX/WPS) for classification only; size-capped.
+let attachmentCalls = 0;
+function attachmentText(url) {
+  const file = key(url);
+  if (attachmentCalls >= Number(arg("attachLimit", 25)) && !fs.existsSync(file)) return "";
+  try {
+    if (!fs.existsSync(file)) { attachmentCalls += 1; execFileSync("curl", ["-fL", "--max-time", "60", "--max-filesize", "15000000", "-sS", "-A", "Mozilla/5.0", "-o", file, url], { stdio: "ignore" }); }
+    const ext = url.split(".").pop().toLowerCase();
+    const cmd = ext === "pdf" ? ["pdftotext", ["-l", "15", file, "-"]] : ext === "docx" ? ["unzip", ["-p", file, "word/document.xml"]] : ["catdoc", ["-d", "utf-8", file]];
+    return execFileSync(cmd[0], cmd[1], { maxBuffer: 32 << 20, timeout: 60000, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8").replace(/<[^>]+>/g, "").replace(/\s+/g, "");
+  } catch { return ""; }
 }
 const pubDate = (html) => /<meta\s+name="PubDate"\s+content="(\d{4}-\d{2}-\d{2})/.exec(html || "")?.[1] ?? null;
 const ev = fs.existsSync(output) ? JSON.parse(fs.readFileSync(output, "utf8")) : {};
@@ -111,8 +139,27 @@ for (const [col, name] of [["https://www.miit.gov.cn/jgsj/ycls/wjfb/index.html",
   }
 }
 
+// ---- CSRC rule lists via the page's own searchList JSON (证监会令 / 证监会公告) ----
+for (const [channel, name] of [["cd11df89f5894c1eac37ae37cc11e369", "证监会令"], ["625a2f95cc104c1d8b646f98d9f87470", "证监会公告"]]) {
+  let rows = 0;
+  for (let p = 1; p <= 2; p += 1) {
+    const raw = get(`https://www.csrc.gov.cn/searchList/${channel}?_isAgg=true&_isJson=true&_pageSize=20&_template=index&_rangeTimeGte=&_channelName=&page=${p}`, { min: 100 });
+    let data = null; try { data = JSON.parse(raw || "null")?.data; } catch { /* below */ }
+    if (!data?.results) { log.push(`csrc ${name} json page ${p} failed`); break; }
+    for (const r of data.results) {
+      const url = "https:" + r.url.replace(/^https?:/, "");
+      const body = (r.content || r.memo || "").replace(/\s+/g, "");
+      const themes = [...new Set([...classifyPolicy(r.title), ...classifyBody(body), "capitalMarketInstitution"])];
+      addDoc({ title: r.title, url, releaseDate: (r.publishedTimeStr || "").slice(0, 10), publisher: `中国证监会·${name}`, themes,
+        matchedBy: "source+body", bodyChecked: true, attachments: (r.resList || []).filter((x) => x.type === "FILE").map((x) => ({ title: x.title, url: "https://www.csrc.gov.cn" + x.filePath })).slice(0, 5) });
+      rows += 1;
+    }
+  }
+  if (!rows) log.push(`csrc ${name} empty`);
+}
+
 // ---- CSRC (reachable from DMIT): portal homepage (MM-DD dates) + rule/announcement lists ----
-for (const url of ["https://www.csrc.gov.cn/csrc/c106256/common_list.shtml", "https://www.csrc.gov.cn/csrc/c101953/common_list.shtml", "https://www.csrc.gov.cn/csrc/c101954/common_list.shtml", "https://www.csrc.gov.cn/csrc/c100028/common_list.shtml"]) {
+for (const url of ["https://www.csrc.gov.cn/csrc/c106256/common_list.shtml"]) {
   const html = get(url);
   if (!html) { log.push(`csrc unreachable ${url}`); continue; }
   let n = 0;
@@ -136,7 +183,12 @@ for (const url of ["https://www.csrc.gov.cn/csrc/c106256/common_list.shtml", "ht
     fetched += 1;
     d.bodyChecked = true;
     if (!html) continue;
-    const body = P.pageText(html).compact;
+    let body = P.pageText(html).compact;
+    const atts = attachmentLinks(html, d.url);
+    if (atts.length && (body.length < 1500 || !d.themes.length)) {
+      const texts = atts.slice(0, 2).map(attachmentText).filter(Boolean);
+      if (texts.length) { body += texts.join(""); d.attachmentTextChars = texts.join("").length; }
+    }
     const bodyThemes = classifyBody(body);
     const added = bodyThemes.filter((t) => !d.themes.includes(t));
     if (added.length) { d.themes = [...d.themes, ...added]; d.matchedBy = d.matchedBy ? `${d.matchedBy}+body` : "body"; }
@@ -162,6 +214,35 @@ for (const base of ["https://zwgls.mof.gov.cn/tjsj/", "https://yss.mof.gov.cn/zh
       if (r) ev.localBonds[period] = { ...r, sourceUrl: url, releaseDate: `${m[1].slice(8, 12)}-${m[1].slice(12, 14)}-${m[1].slice(14, 16)}`, originalPublisher: "财政部" };
       else log.push(`mof bond parse failed ${url}`);
     }
+  }
+}
+
+// ---- Annual targets (quota denominators) from the Government Work Report full text ----
+ev.annualTargets = ev.annualTargets || {};
+try {
+  const cfg = JSON.parse(fs.readFileSync(path.join(root, "config/annual-fiscal-targets-sources.json"), "utf8"));
+  for (const [year, src] of Object.entries(cfg.years)) {
+    if (ev.annualTargets[year]?.specialBondQuota) continue;
+    const html = get(src.url, { cache: true });
+    const t = html && parseAnnualTargets(P.pageText(html).compact);
+    if (t) ev.annualTargets[year] = { ...t, unit: "亿元", sourceUrl: src.url, publisher: src.publisher };
+    else log.push(`annual targets ${year} not parsed`);
+  }
+} catch (e) { log.push(`annual targets: ${e.message}`); }
+
+// ---- Policy banks (CDB needs a real browser for its JS check; Exim/ADBC plain) ----
+for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发银行"], ["https://www.eximbank.gov.cn/", "中国进出口银行"], ["https://www.adbc.com.cn/n5/n15/index.html", "中国农业发展银行"]]) {
+  const html = get(list) || browserGet(list);
+  if (!html) { log.push(`${bank} list unreachable`); continue; }
+  const items = parseNewsList(html, list).filter((x) => /政策性金融工具|金融工具|资本金|注资/.test(x.title));
+  for (const it of items.slice(0, 8)) {
+    if (ev.policyFinance[it.url]?.facts?.length) continue;
+    const page = fetchAny(it.url);
+    if (!page) { log.push(`${bank} article unreachable ${it.url}`); continue; }
+    const text = P.pageText(page).compact;
+    const facts = extractPolicyFinanceFacts(text);
+    const date = it.date || /(20\d\d)[-年](\d{2})[-月](\d{2})/.exec(text)?.slice(1).join("-") || null;
+    ev.policyFinance[it.url] = { title: it.title, url: it.url, releaseDate: date, publisher: bank, facts, capitalInjection: /注资/.test(it.title) };
   }
 }
 
@@ -233,4 +314,4 @@ ev.log = log;
 fs.writeFileSync(output + ".tmp", JSON.stringify(ev, null, 1) + "\n");
 fs.renameSync(output + ".tmp", output);
 console.log(JSON.stringify({ cnbs: Object.keys(ev.cnbs).sort().at(-1) ?? null, bis: Object.fromEntries(Object.entries(ev.bis).map(([k, v]) => [k, v.rows.at(-1)])),
-  policyDocs: Object.keys(ev.policyDocs).length, byPublisher: Object.values(ev.policyDocs).reduce((a, d) => ({ ...a, [d.publisher]: (a[d.publisher] || 0) + 1 }), {}), bodyMatched: Object.values(ev.policyDocs).filter((d) => /body/.test(d.matchedBy || "")).length, localBonds: Object.keys(ev.localBonds).sort().at(-1) ?? null, localBondMonths: Object.keys(ev.localBonds).length, policyFinance: Object.keys(ev.policyFinance).length, toolTables: Object.keys(ev.toolTables).sort().at(-1) ?? null, rrrNotices: Object.keys(ev.rrrNotices).length, rrrScan: ev.rrrNoticeScan, problems: log }));
+  policyDocs: Object.keys(ev.policyDocs).length, byPublisher: Object.values(ev.policyDocs).reduce((a, d) => ({ ...a, [d.publisher]: (a[d.publisher] || 0) + 1 }), {}), bodyMatched: Object.values(ev.policyDocs).filter((d) => /body/.test(d.matchedBy || "")).length, localBonds: Object.keys(ev.localBonds).sort().at(-1) ?? null, localBondMonths: Object.keys(ev.localBonds).length, policyFinance: Object.keys(ev.policyFinance).length, policyFinanceWithFacts: Object.values(ev.policyFinance).filter((x) => x.facts?.length).length, annualTargets: ev.annualTargets, attachmentsRead: Object.values(ev.policyDocs).filter((d) => d.attachmentTextChars).length, browserCalls, toolTables: Object.keys(ev.toolTables).sort().at(-1) ?? null, rrrNotices: Object.keys(ev.rrrNotices).length, rrrScan: ev.rrrNoticeScan, problems: log }));

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { buildDraft, rulesHash } from "../lib/macro-rating-draft.mjs";
 import { buildSuggestions, JUDGEMENT_IDS } from "../lib/macro-rating-suggest.mjs";
-import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody } from "../lib/macro-rating-judgement-parse.mjs";
+import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody, parseAnnualTargets, parseNewsList, attachmentLinks } from "../lib/macro-rating-judgement-parse.mjs";
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
@@ -84,4 +84,12 @@ test("special-bond, structural-tool and policy-finance parsers", () => {
   const f = extractPolicyFinanceFacts("首页|登录|8000亿元新型政策性金融工具资金加快投放|国开新型政策性金融工具已投放资金608.5亿元，支持项目153个。无关句子。");
   assert.deepEqual(f.map((x) => x.amounts), [[8000], [608.5]]);
   assert.deepEqual(classifyBody("上市公司分红…上市公司回购…资本市场"), ["capitalMarketInstitution"]);
+});
+
+test("annual targets, news lists and attachment links", () => {
+  assert.deepEqual(parseAnnualTargets("拟发行超长期特别国债1.3万亿元，持续支持。拟安排地方政府专项债券4.4万亿元，完善。发行新型政策性金融工具8000亿元，带动"),
+    { specialBondQuota: 44000, policyFinanceToolQuota: 8000, ultraLongSpecialTreasury: 13000 });
+  const l = parseNewsList('<a href="./202609/t20260924_13583.html">国开新型政策性金融工具9月以来已投放超600亿元</a><a href="./info/news/202609/t20260906_77538.html"><h4>财政部将向中国进出口银行注资</h4><h5>2026-09-06</h5></a>', "https://www.cdb.com.cn/xwzx/khdt/");
+  assert.deepEqual(l.map((x) => [x.date, x.title]), [["2026-09-24", "国开新型政策性金融工具9月以来已投放超600亿元"], ["2026-09-06", "财政部将向中国进出口银行注资"]]);
+  assert.deepEqual(attachmentLinks('<a href="/files/a.PDF">x</a><a href="b.wps">', "https://x.gov.cn/p/"), ["https://x.gov.cn/files/a.PDF", "https://x.gov.cn/p/b.wps"]);
 });
