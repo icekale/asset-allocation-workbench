@@ -9,7 +9,7 @@ import { scoreIndicator } from "../lib/macro-rating.mjs";
 const fx = (f) => fs.readFileSync(new URL(`./fixtures/rating-evidence/${f}`, import.meta.url), "utf8");
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
-const lock = read("config/macro-rating-rules-lock.json");
+const lock = read("config/macro-rating-rules-lock-v1.21.json");
 
 test("every indicator is either auto (mapper/builder) or an explained manual item", () => {
   for (const r of framework.indicators) assert.ok(AUTO_MAPPERS[r.id] || BUILDERS[r.id] || MANUAL_REASONS[r.id], r.id);

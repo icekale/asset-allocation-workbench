@@ -9,10 +9,12 @@ const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..")
 const p = (rel) => path.join(root, rel);
 const read = (rel) => JSON.parse(fs.readFileSync(p(rel), "utf8"));
 const writeAtomic = (rel, value) => { const tmp = p(rel) + ".tmp"; fs.writeFileSync(tmp, JSON.stringify(value, null, 2) + "\n"); fs.renameSync(tmp, p(rel)); };
-const F = { framework: "app/data/macro-rating-v1.json", current: "app/data/macro-rating-current.json", history: "app/data/macro-rating-history.json",
+const F = { rules: "app/data/macro-rating-v1.22.json", framework: "app/data/macro-rating-v1.json", current: "app/data/macro-rating-current.json", history: "app/data/macro-rating-history.json",
   draft: "app/data/macro-rating-draft.json", lock: "config/macro-rating-rules-lock.json", flag: "output/macro-rating-draft-notable.json" };
 const cmd = process.argv[2] || "build";
 const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
+// Active locked rules: V1.22 file until it is published (then v1.json carries V1.22 and the file is identical by hash).
+const rulesFw = () => fs.existsSync(p(F.rules)) ? read(F.rules) : read(F.framework);
 const today = () => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai" }).format(new Date());
 
 if (cmd === "lock") {
@@ -31,7 +33,7 @@ if (cmd === "lock") {
 } else if (cmd === "build") {
   const loaded = loadDraftData(read);
   const data = { ...loaded.data, ev: loaded.ev };
-  const draft = buildDraft({ framework: read(F.framework), current: read(F.current), lock: read(F.lock), data, asOf: arg("as-of") || today() });
+  const draft = buildDraft({ framework: rulesFw(), baseFramework: read(F.framework), current: read(F.current), lock: read(F.lock), data, asOf: arg("as-of") || today() });
   writeAtomic(F.draft, draft);
   fs.mkdirSync(p("output"), { recursive: true });
   const summary = { generatedAt: draft.generatedAt, asOf: draft.asOf, before: draft.before.score, after: draft.after.score,
@@ -41,7 +43,7 @@ if (cmd === "lock") {
   console.log(`[macro-rating-draft] ${draft.notable ? "NOTABLE " : ""}${JSON.stringify(summary)}`);
 } else if (cmd === "publish") {
   if (!fs.existsSync(p(F.draft))) { console.error("没有待发布草稿"); process.exit(1); }
-  const out = publishDraft({ framework: read(F.framework), current: read(F.current), history: read(F.history), lock: read(F.lock), draft: read(F.draft) });
+  const out = publishDraft({ framework: rulesFw(), baseFramework: read(F.framework), current: read(F.current), history: read(F.history), lock: read(F.lock), draft: read(F.draft) });
   writeAtomic(F.history, out.history); writeAtomic(F.current, out.current); writeAtomic(F.framework, out.framework);
   fs.unlinkSync(p(F.draft)); if (fs.existsSync(p(F.flag))) fs.unlinkSync(p(F.flag));
   console.log(JSON.stringify(out.record));

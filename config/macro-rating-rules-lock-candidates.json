@@ -5,12 +5,13 @@
       "sha256": "306bfd81271436adc50abeeb699464a241a4c8db6cf0de0ec96e04bd957efc0b",
       "baseRulesVersion": "V1.21",
       "baseSha256": "33630d6fd616822af98291fa43fb0543e708431e2b656a865984d090206c594b",
-      "status": "staged-not-active",
+      "status": "promoted-to-V1.22",
       "changedIndicators": [
         "F09",
         "F10"
       ],
-      "frozenAt": "2026-10-13"
+      "frozenAt": "2026-10-13",
+      "promotedAt": "2026-10-13"
     }
   }
 }

@@ -7,7 +7,7 @@ import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, pa
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
-const lock = read("config/macro-rating-rules-lock.json");
+const lock = read("config/macro-rating-rules-lock-v1.21.json");
 const asOf = current.asOf;
 const months = Array.from({ length: 12 }, (_, i) => { const d = new Date(Date.UTC(2025, 9 + i, 1)); return d.toISOString().slice(0, 7); });
 const jev = {
@@ -146,4 +146,27 @@ test("derived special-bond series carries proxy and combined-spend columns witho
   assert.equal(s.rows.find((r) => r.period === "2026-08").govFundExpenditureYtd, 51948);
   assert.match(s.basis, /非官方序列/);
   assert.ok(s.rows.every((r) => r.disbursedYtd == null || Number.isFinite(r.disbursedYtd)));
+});
+
+test("V1.22 draft: F09/F10 auto-scored from CNBS curves, no manual suggestion; P03/P04 still pending; publish yields V1.22", async () => {
+  const { publishDraft, rulesHash: rh } = await import("../lib/macro-rating-draft.mjs");
+  const rules = read("app/data/macro-rating-v1.22.json"), lock122 = read("config/macro-rating-rules-lock.json");
+  const cnbs = { "2025-Q2": { household: { value: 61.1, previous: 61.5 }, corporate: { value: 174, previous: 173.7 }, sourceUrl: "http://www.nifd.cn/SeriesReport/Details/4728", releaseDate: "2025-07-30" },
+    "2026-Q2": { household: { value: 57.7, previous: 59 }, corporate: { value: 179.5, previous: 180 }, sourceUrl: "http://www.nifd.cn/SeriesReport/Details/4976", releaseDate: "2026-07-30" } };
+  const d = buildDraft({ framework: rules, baseFramework: framework, current, lock: lock122, data: { ...data, jev: { ...jev, cnbs }, confirmations: { entries: [] } }, asOf: "2026-10-13" });
+  assert.equal(d.rulesVersion, "V1.22");
+  assert.equal(d.rulesChanged, true);
+  const f09 = d.rows.find((r) => r.id === "F09"), f10 = d.rows.find((r) => r.id === "F10");
+  assert.equal(f09.source, "auto-curve"); assert.equal(f10.source, "auto-curve");
+  assert.equal(f09.oldScore, 2.5);
+  assert.ok(Math.abs(f09.newScore - 2.3125) < 1e-9);
+  assert.ok(Math.abs(f10.newScore - (0.5 * (2 - 7.5 / 13) + 0.5 * (2.5 - 2.5 / 3))) < 1e-9);
+  assert.equal(f09.suggestion, null);
+  for (const id of ["P03A", "P03B", "P04A", "P04B"]) assert.equal(d.rows.find((r) => r.id === id).source, "manual-carry");
+  assert.equal(d.counts.pendingSuggestions, 4);
+  const history = read("app/data/macro-rating-history.json");
+  const out = publishDraft({ framework: rules, baseFramework: framework, current, history, lock: lock122, draft: d });
+  assert.equal(out.framework.version, "V1.22");
+  assert.equal(rh(out.framework), lock122.sha256);
+  assert.match(out.current.reviewSummary, /升级为V1\.22/);
 });

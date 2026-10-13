@@ -5,7 +5,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { rulesHash, assertRulesLocked } from "../lib/macro-rating-draft.mjs";
 import { evaluateMacroRating, scoreIndicator } from "../lib/macro-rating.mjs";
-import { interp } from "../lib/macro-leverage-curve.mjs";
+import { interp, cnbsObservations } from "../lib/macro-leverage-curve.mjs";
+export { cnbsObservations };
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const p = (rel) => path.join(root, rel);
@@ -28,7 +29,7 @@ export function buildCandidate(fw) {
     const household = r.id === "F09";
     const n = { ...r, unit: "%", mode: "曲线", measurementBasis: "部门债务/过去四季名义GDP",
       scoring: { method: "leverage-curve-composite", levelWeight: 0.5, ...CURVES[r.id],
-        description: `${household ? "居民" : "非金融企业"}部门杠杆率：0.5×水平曲线 + 0.5×同比变动(百分点)曲线，固定分段线性，只插值得分不插值数据；缺上年同季原值则不计分（不补中性）。锚点依据见 docs/MACRO_RATING_V1_22_CANDIDATE.md。` },
+        description: `${household ? "居民" : "非金融企业"}部门杠杆率：0.5×水平曲线 + 0.5×同比变动(百分点)曲线，固定分段线性，只插值得分不插值数据；缺上年同季原值则不计分（不补中性）。锚点依据见 docs/MACRO_RATING_V1_22.md。` },
       definition: `国家资产负债表研究中心(CNBS/NIFD)季度${household ? "居民" : "非金融企业"}部门杠杆率原值（本季与上年同季），按固定曲线计分；替代V1.21证据矩阵研判。` };
     delete n.evidenceType; delete n.grades;
     return n;
@@ -36,27 +37,14 @@ export function buildCandidate(fw) {
   return c;
 }
 
-const qAdd = (q, k) => { const [y, n] = q.split("-Q").map(Number); const t = y * 4 + n - 1 + k; return `${Math.floor(t / 4)}-Q${(t % 4) + 1}`; };
-
-/** Candidate observations per CNBS quarter from collected evidence (verified original values only). */
-export function cnbsObservations(cnbs, id) {
-  const side = id === "F09" ? "household" : "corporate", level = {};
-  for (const [q, r] of Object.entries(cnbs)) { if (Number.isFinite(r[side]?.previous) && level[qAdd(q, -1)] === undefined) level[qAdd(q, -1)] = { v: r[side].previous, src: r.sourceUrl, rel: r.releaseDate, prevField: true }; }
-  for (const [q, r] of Object.entries(cnbs)) if (Number.isFinite(r[side]?.value)) level[q] = { v: r[side].value, src: r.sourceUrl, rel: r.releaseDate };
-  return Object.keys(cnbs).sort().map((q) => {
-    const r = cnbs[q], ya = level[qAdd(q, -4)];
-    return { quarter: q, obs: { value: r[side].value, leverageRatio: r[side].value, yearAgoLeverageRatio: ya?.v ?? null, yearAgoPeriod: qAdd(q, -4),
-      unit: "%", basis: "部门债务/过去四季名义GDP", originalPublisher: "国家资产负债表研究中心", period: q, latestAvailablePeriod: q,
-      sourceUrl: r.sourceUrl, releaseDate: r.releaseDate, verified: true, verifiedAt: r.releaseDate, yearAgoNote: ya ? (ya.prevField ? "上年同季取自下一季报告“上季”原值" : "上年同季取自当季报告原值") : "无上年同季原值" } };
-  });
-}
-
 const cmd = process.argv[2] || "backtest";
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const fw = read("app/data/macro-rating-v1.json"), lock = read("config/macro-rating-rules-lock.json");
+  const fw = read("app/data/macro-rating-v1.21.json"), lock = read("config/macro-rating-rules-lock-v1.21.json");
   assertRulesLocked(fw, lock); // V1.21 must remain frozen and active
   const cand = buildCandidate(fw), hash = rulesHash(cand);
-  if (cmd === "build") {
+  if (cmd === "build" && fs.existsSync(p(CLOCK)) && read(CLOCK).candidates["V1.22-candidate"]?.status === "promoted-to-V1.22") {
+    console.log("V1.22-candidate already promoted to active V1.22 (app/data/macro-rating-v1.22.json); candidate files are archival.");
+  } else if (cmd === "build") {
     write(CAND, cand);
     const locks = fs.existsSync(p(CLOCK)) ? read(CLOCK) : { note: "候选（未启用）规则版本的冻结哈希；生效锁仍是 config/macro-rating-rules-lock.json(V1.21)。", candidates: {} };
     const prior = locks.candidates["V1.22-candidate"];

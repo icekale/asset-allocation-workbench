@@ -1,27 +1,36 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { rulesHash } from "../lib/macro-rating-draft.mjs";
+import { rulesHash, reproduceSnapshot } from "../lib/macro-rating-draft.mjs";
 import { scoreIndicator } from "../lib/macro-rating.mjs";
-import { buildCandidate, cnbsObservations } from "../scripts/macro-v1-22-candidate.mjs";
+import { buildCandidate, cnbsObservations, CURVES } from "../scripts/macro-v1-22-candidate.mjs";
 import { interp } from "../lib/macro-leverage-curve.mjs";
 import { machineAttestP02E } from "../lib/macro-rating-suggest.mjs";
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url)));
-const fw = read("app/data/macro-rating-v1.json"), lock = read("config/macro-rating-rules-lock.json");
+const fw = read("app/data/macro-rating-v1.21.json"), lock = read("config/macro-rating-rules-lock.json");
 
-test("V1.21 stays the active frozen rule set; candidate is staged with its own hash", () => {
-  assert.equal(rulesHash(fw), lock.sha256);
-  assert.equal(lock.rulesVersion, "V1.21");
-  const cand = buildCandidate(fw), staged = read("app/data/macro-rating-v1.22-candidate.json");
-  assert.equal(rulesHash(cand), rulesHash(staged));
-  assert.equal(read("config/macro-rating-rules-lock-candidates.json").candidates["V1.22-candidate"].sha256, rulesHash(cand));
-  assert.equal(read("config/macro-rating-rules-lock-candidates.json").candidates["V1.22-candidate"].status, "staged-not-active");
-  for (const r of cand.indicators) {
-    const o = fw.indicators.find((x) => x.id === r.id);
+test("V1.22 is the active locked rule set; V1.21 is frozen and still reproduces its snapshot", () => {
+  const v122 = read("app/data/macro-rating-v1.22.json"), v121 = read("app/data/macro-rating-v1.21.json"), l121 = read("config/macro-rating-rules-lock-v1.21.json");
+  assert.equal(lock.rulesVersion, "V1.22");
+  assert.equal(rulesHash(v122), lock.sha256);
+  assert.equal(rulesHash(v121), l121.sha256);
+  assert.equal(l121.sha256, "33630d6fd616822af98291fa43fb0543e708431e2b656a865984d090206c594b");
+  assert.equal(lock.previous.sha256, l121.sha256);
+  const cur = read("app/data/macro-rating-current.json"), hist = read("app/data/macro-rating-history.json");
+  if (cur.version === "V1.21") {
+    const snap = hist.snapshots.find((x) => x.version === "V1.21" && x.asOf === cur.asOf);
+    assert.equal(reproduceSnapshot(v121, cur, snap).ok, true);
+  }
+  for (const r of v122.indicators) {
+    const o = v121.indicators.find((x) => x.id === r.id);
     assert.equal(r.weight, o.weight);
     if (!["F09", "F10"].includes(r.id)) assert.deepEqual(r, o);
+    else assert.deepEqual({ l: r.scoring.levelAnchors, y: r.scoring.yoyAnchors, w: r.scoring.levelWeight }, { l: CURVES[r.id].levelAnchors, y: CURVES[r.id].yoyAnchors, w: 0.5 });
   }
+  assert.deepEqual(v122.pillars, v121.pillars);
+  assert.deepEqual(v122.ratingBands, v121.ratingBands);
+  assert.equal(read("config/macro-rating-rules-lock-candidates.json").candidates["V1.22-candidate"].status, "promoted-to-V1.22");
 });
 
 test("curve scores interpolate, and a missing year-ago value scores null (no neutral fill)", () => {

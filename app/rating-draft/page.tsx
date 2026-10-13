@@ -16,7 +16,7 @@ type Draft = { generatedAt: string; asOf: string; baseVersion: string; baseAsOf:
   after: { score: number | null; grade: string | null; status: string; pillars: Record<string, number | null> }; rows: Row[] };
 
 const f = (v: number | null | undefined, d = 2) => v === null || v === undefined ? "—" : v.toFixed(d);
-const sourceLabel: Record<string, string> = { auto: "自动新一期", "auto-no-new": "无更新", "auto-rejected": "新数据未通过核验", "manual-carry": "人工项·沿用", "manual-confirmed": "用户已确认建议", "manual-edited": "用户改档", "manual-kept": "用户选择沿用" };
+const sourceLabel: Record<string, string> = { auto: "自动新一期", "auto-no-new": "无更新", "auto-rejected": "新数据未通过核验", "manual-carry": "人工项·沿用", "manual-confirmed": "用户已确认建议", "manual-edited": "用户改档", "manual-kept": "用户选择沿用", "machine-attested": "机器核验自动采用", "auto-curve": "CNBS曲线自动计分" };
 
 export default async function RatingDraftPage() {
   if (!(await isAuthorized())) return <LoginForm />;
@@ -30,10 +30,10 @@ export default async function RatingDraftPage() {
       {!draft ? <p>{status === 404 ? "当前没有待发布的评分草稿。采集 apply 完成后会自动生成。" : `无法读取草稿：${String(body.error ?? status)}`}</p> : (
         <>
           <p style={{ color: "#555" }}>{draft.policy}</p>
-          <p>基于 {draft.baseVersion}（截止 {draft.baseAsOf}）→ 草稿截止 {draft.asOf}；规则冻结版本 {draft.rulesVersion}；生成于 {draft.generatedAt}</p>
+          <p>基于 {draft.baseVersion}（截止 {draft.baseAsOf}）→ 草稿截止 {draft.asOf}；生效规则版本 {draft.rulesVersion}（已冻结）；生成于 {draft.generatedAt}</p>
           <h2>总分 {f(draft.before.score)} → {f(draft.after.score)}（Δ {f(draft.totalDelta, 3)}）{draft.notable && <span style={{ color: "#c00" }}> · 显著变化</span>}</h2>
           <p>档位：{draft.before.grade ?? "—"} → {draft.after.grade ?? "—"}{draft.tierChanged ? "（档位变化）" : ""}；状态 {draft.after.status}</p>
-          <p>自动新一期 {draft.counts.auto} 项 · 可自动但无更新 {draft.counts.autoNoNew ?? 0} 项 · 新数据未通过核验 {draft.counts.autoRejected ?? 0} 项 · 人工项沿用 {draft.counts.manualCarry} 项 · 已确认 {draft.counts.manualConfirmed ?? 0} 项 · 待确认建议 {draft.counts.pendingSuggestions ?? 0} 项 · 缺数据 {draft.counts.missing} 项（缺数据不重新分配权重）</p>
+          <p>自动新一期 {draft.counts.auto} 项 · 可自动但无更新 {draft.counts.autoNoNew ?? 0} 项 · 新数据未通过核验 {draft.counts.autoRejected ?? 0} 项 · 人工项沿用 {draft.counts.manualCarry} 项 · 已确认 {draft.counts.manualConfirmed ?? 0} 项 · 机器核验 {draft.counts.machineAttested ?? 0} 项 · 待确认建议 {draft.counts.pendingSuggestions ?? 0} 项 · 缺数据 {draft.counts.missing} 项（缺数据不重新分配权重）</p>
           <table style={{ borderCollapse: "collapse", width: "100%", margin: "8px 0" }}>
             <thead><tr>{["大类", "旧分", "新分"].map((h) => <th key={h} style={cell}>{h}</th>)}</tr></thead>
             <tbody>{Object.keys(draft.before.pillars).map((name) => <tr key={name}><td style={cell}>{name}</td><td style={cell}>{f(draft.before.pillars[name])}</td><td style={cell}>{f(draft.after.pillars[name])}</td></tr>)}</tbody>

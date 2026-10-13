@@ -5,7 +5,7 @@ import { buildDraft, publishDraft, reproduceSnapshot, rulesHash, nextVersion } f
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
-const history = read("app/data/macro-rating-history.json"), lock = read("config/macro-rating-rules-lock.json");
+const history = read("app/data/macro-rating-history.json"), lock = read("config/macro-rating-rules-lock-v1.21.json");
 const emptyData = { prices: { rows: [] }, money: { rows: [] } };
 
 test("V1.21 snapshot reproduces exactly from frozen rules", () => {

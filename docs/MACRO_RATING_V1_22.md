@@ -1,8 +1,11 @@
-# 宏观评分 V1.22-candidate（候选，未启用）
+# 宏观评分 V1.22 规则
 
-状态：**staged-not-active**。草稿和发布继续使用 V1.21，即 `config/macro-rating-rules-lock.json`，sha256 为 `33630d6f…`，规则冻结、可复现。
-候选版本的哈希记在 `config/macro-rating-rules-lock-candidates.json`。候选框架文件是 `app/data/macro-rating-v1.22-candidate.json`，由 `node scripts/macro-v1-22-candidate.mjs build` 生成。
-只有用户明确批准后，才可以把候选框架切换为生效框架；切换时另行建立正式锁。
+状态：**生效（active）**，用户于 2026-10-13 批准。
+- 生效锁：`config/macro-rating-rules-lock.json`，rulesVersion 为 V1.22，sha256 为 `306bfd81…`。
+- 生效规则框架：`app/data/macro-rating-v1.22.json`。草稿按它计算；用户点击发布后，它会成为 `macro-rating-v1.json`。
+- 已发布的正式评分仍是 V1.21，直到用户点击发布。
+- V1.21 冻结存档：`app/data/macro-rating-v1.21.json` 和 `config/macro-rating-rules-lock-v1.21.json`，sha256 为 `33630d6f…`。测试会验证该存档仍能精确复现 V1.21 快照。
+- F09/F10 由草稿根据 CNBS 原值自动计分，不再需要人工确认。P02E 继续机器核验；P03/P04 仍需人工确认。
 
 ## 变更范围
 - 只改 F09（居民部门杠杆约束）和 F10（非金融企业部门杠杆约束）的计分方法：从“证据矩阵研判”改为“固定分段线性曲线”。
