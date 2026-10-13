@@ -269,7 +269,7 @@ ev.specialBondUse = ev.specialBondUse || {};
   } else log.push("mof news list unreachable");
   for (const src of [...cfg.items, ...extra.slice(0, 8)]) {
     if (ev.specialBondUse[src.url]?.statements?.length) continue;
-    const html = get(src.url, { cache: true });
+    const html = get(src.url, { cache: true }) || browserGet(src.url);
     if (!html) { log.push(`special-bond-use unreachable ${src.url}`); continue; }
     const statements = parseSpecialBondUseStatements(P.pageText(html).compact, src);
     if (statements.length) ev.specialBondUse[src.url] = { ...src, statements };
@@ -285,13 +285,34 @@ ev.specialBondUse = ev.specialBondUse || {};
       sample: rows.slice(0, 3).map((s) => ({ id: s.series_id, name: s.name, source: s.source, frequency: s.frequency })),
       conclusion: localOnly ? "Caixin hits are local city fund income/expenditure lines, not a national special-bond use series" : (national.length ? "found candidate national series" : "no Caixin hits") };
   } catch (e) { log.push(`caixin special-bond search: ${e.message.split("\n")[0]}`); }
+  // Alternate Caixin keywords for a national use/disbursement series (still often empty).
+  if (!ev.specialBondUse.caixinNote || ev.specialBondUse.caixinNote.nationalHits === 0) {
+    for (const q of ["专项债券拨付", "地方政府专项债券使用"]) {
+      try {
+        const out = execFileSync(process.execPath, ["--experimental-strip-types", path.join(root, "scripts/caixin-fetch.mjs"), "search", q], { cwd: root, maxBuffer: 4 << 20, timeout: 60000, env: process.env }).toString("utf8");
+        const j = JSON.parse(out);
+        const rows = j.series || [];
+        const national = rows.filter((s) => /^(全国|中国)[:：]/.test(s.name) || (!/[:：]/.test(s.name) && /全国/.test(s.name)));
+        if (national.length) {
+          ev.specialBondUse.caixinNote = { searched: q, hits: rows.length, nationalHits: national.length,
+            sample: national.slice(0, 3).map((s) => ({ id: s.series_id, name: s.name, source: s.source, frequency: s.frequency })),
+            conclusion: `found candidate national series via "${q}"` };
+          break;
+        }
+        if (!ev.specialBondUse.caixinAlt) ev.specialBondUse.caixinAlt = [];
+        ev.specialBondUse.caixinAlt.push({ searched: q, hits: rows.length, nationalHits: 0 });
+      } catch (e) { log.push(`caixin search ${q}: ${e.message.split("\n")[0]}`); }
+    }
+  }
+  if (cfg.celmaNote) ev.specialBondUse.celmaNote = cfg.celmaNote;
 }
 
-// titleOnly cleanup pass: drop list-title stubs when a full mirror/original exists for the same bank
+// titleOnly / empty cleanup: drop stubs when a full mirror/original exists for the same bank
 {
   const banksWithFull = new Set(Object.values(ev.policyFinance).filter((d) => d.facts?.length && (d.sourceKind === "repost" || d.sourceKind === "original")).map((d) => d.bank).filter(Boolean));
   for (const [k, d] of Object.entries(ev.policyFinance)) {
-    if (d.titleOnly && banksWithFull.has(d.bank || d.publisher)) delete ev.policyFinance[k];
+    const bank = d.bank || d.publisher;
+    if (banksWithFull.has(bank) && (d.titleOnly || !d.facts?.length) && (d.sourceKind !== "repost" && d.sourceKind !== "original")) delete ev.policyFinance[k];
   }
 }
 
@@ -301,9 +322,14 @@ try {
   const cfg = JSON.parse(fs.readFileSync(path.join(root, "config/annual-fiscal-targets-sources.json"), "utf8"));
   for (const [year, src] of Object.entries(cfg.years)) {
     if (ev.annualTargets[year]?.specialBondQuota) continue;
-    const html = get(src.url, { cache: true });
-    const t = html && parseAnnualTargets(P.pageText(html).compact);
-    if (t) ev.annualTargets[year] = { ...t, unit: "亿元", sourceUrl: src.url, publisher: src.publisher };
+    const candidates = [{ url: src.url, publisher: src.publisher }, ...(src.mirrors || [])];
+    let got = null;
+    for (const c of candidates) {
+      const html = get(c.url, { cache: true }) || browserGet(c.url);
+      const t = html && parseAnnualTargets(P.pageText(html).compact);
+      if (t) { got = { ...t, unit: "亿元", sourceUrl: c.url, publisher: c.publisher }; break; }
+    }
+    if (got) ev.annualTargets[year] = got;
     else log.push(`annual targets ${year} not parsed`);
   }
 } catch (e) { log.push(`annual targets: ${e.message}`); }
@@ -391,6 +417,15 @@ ev.rrrNotices = ev.rrrNotices || {};
     if (oldest && oldest < `${new Date().getFullYear() - 1}-${String(new Date().getMonth() + 1).padStart(2, "0")}-01`) break;
   }
   ev.rrrNoticeScan = { listUrl: N + "index.html", scannedItems: scanned, oldestDate: oldest, at: ev.generatedAt.slice(0, 10) };
+}
+
+// Final cleanup: drop empty/titleOnly stubs when a full mirror/original exists for the same bank
+{
+  const banksWithFull = new Set(Object.values(ev.policyFinance || {}).filter((d) => d.facts?.length && (d.sourceKind === "repost" || d.sourceKind === "original")).map((d) => d.bank).filter(Boolean));
+  for (const [k, d] of Object.entries(ev.policyFinance || {})) {
+    const bank = d.bank || (/国家开发银行|中国进出口银行|中国农业发展银行/.exec(d.publisher || "")?.[0]);
+    if (banksWithFull.has(bank) && (d.titleOnly || !d.facts?.length) && d.sourceKind !== "repost" && d.sourceKind !== "original") delete ev.policyFinance[k];
+  }
 }
 
 ev.log = log;

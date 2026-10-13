@@ -1,6 +1,13 @@
 {
-  "note": "Official full-text sources of the annual Government Work Report (NPC). Parsed for quota denominators only; evidence, not scoring.",
+  "note": "Official full-text sources of the annual Government Work Report. Prefer NPC; if TLS/blocked, use labelled local-gov reprints of the same NPC text. Parsed for quota denominators only; evidence, not scoring.",
   "years": {
-    "2026": { "url": "http://www.npc.gov.cn/npc/c2/c30834/202603/t20260316_453264.html", "publisher": "全国人大（政府工作报告全文）" }
+    "2026": {
+      "url": "https://www.hnswjrb.gov.cn/2026/03-14/3634696.html",
+      "publisher": "河南省地方金融管理局（转载全国人大《政府工作报告》全文）",
+      "mirrors": [
+        { "url": "https://www.jstz.gov.cn/a/20260314/1773494743278.shtml", "publisher": "江苏统一战线（转载全国人大《政府工作报告》全文）" },
+        { "url": "http://www.npc.gov.cn/npc/c2/c30834/202603/t20260316_453264.html", "publisher": "全国人大（政府工作报告全文）" }
+      ]
+    }
   }
 }

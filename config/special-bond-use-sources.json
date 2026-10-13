@@ -1,8 +1,13 @@
 {
-  "note": "Official MOF statements on special-bond issuance/use. No monthly use series found; these are dated structured statements. Evidence only.",
+  "note": "Official MOF/People's Daily statements on special-bond issuance/use/disbursement. No monthly national use series found on MOF/NDRC/celma/Caixin; these are dated structured statements. Evidence only. celma.org.cn is per-province issuance disclosure, not a national use series.",
   "items": [
     {
-      "url": "http://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202607/t20260722_3994019.htm",
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202604/t20260424_3988407.htm",
+      "publisher": "财政部（2026年一季度财政收支情况新闻发布会文字实录）",
+      "releaseDate": "2026-04-24"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202607/t20260722_3994019.htm",
       "publisher": "财政部（2026年上半年财政收支情况新闻发布会文字实录）",
       "releaseDate": "2026-07-22"
     },
@@ -10,6 +15,15 @@
       "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202610/t20261009_4002434.htm",
       "publisher": "财政部（2026年上半年中国财政政策执行情况报告）",
       "releaseDate": "2026-10-09"
+    },
+    {
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-09/doc-iniuqiyp4079891.shtml",
+      "publisher": "新浪财经转载人民日报《更好发挥专项债促投资作用》（政策解读，转述财政部）",
+      "releaseDate": "2026-10-09"
     }
-  ]
+  ],
+  "celmaNote": {
+    "url": "https://www.celma.org.cn/",
+    "conclusion": "中国地方政府债券信息公开平台（celma）公开各省市发行前披露与发行结果，无全国统一的专项债「使用/拨付」月度序列"
+  }
 }

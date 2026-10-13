@@ -102,4 +102,9 @@ test("special-bond use statements and cleaner policy-finance facts", () => {
   const u = parseSpecialBondUseStatements("上半年各地累计发行新增专项债券2.07万亿元，发行进度47%，支持建设项目超1.7万个，其中用于项目资本金超1700亿元。截至7月末，发行新增专项债券2.41万亿元，支持建设项目超1.8万个。指导督促各地加快资金拨付使用进度，尽快形成实物工作量。", { sourceUrl: "https://mof.example/a", releaseDate: "2026-07-22", publisher: "财政部" });
   assert.ok(u.some((x) => x.kind === "issuance" && x.issuedYi === 20700 && x.progressPct === 47 && x.capitalYi === 1700));
   assert.ok(u.some((x) => x.kind === "issuance-asof" && x.asOfMonth === 7 && x.issuedYi === 24100));
+  const d = parseSpecialBondUseStatements("新增专项债券方面，今年一季度全国共发行11599亿元，较去年同期增加1996亿元，增长20.8%；拨付专项债券资金6723亿元，较去年同期增加2096亿元，有力推动形成实物工作量。用于置换存量隐性债务的专项债券方面，一季度全国共发行9604亿元，完成全年限额2万亿元的48%，拨付专项债券资金5904亿元，有力支持地方置换存量隐性债务。截至9月20日，全国新增专项债发行3.1万亿元，完成全年限额的70%。", { sourceUrl: "https://mof.example/q1", releaseDate: "2026-04-24", publisher: "财政部" });
+  assert.ok(d.some((x) => x.kind === "disbursement" && x.disbursedYi === 6723 && !x.isSwap));
+  assert.ok(d.some((x) => x.kind === "disbursement-swap" && x.disbursedYi === 5904));
+  assert.ok(d.some((x) => x.kind === "issuance" && x.issuedYi === 11599));
+  assert.ok(d.some((x) => x.kind === "issuance-asof-date" && x.asOfMonth === 9 && x.asOfDay === 20 && x.issuedYi === 31000 && x.progressPct === 70));
 });
