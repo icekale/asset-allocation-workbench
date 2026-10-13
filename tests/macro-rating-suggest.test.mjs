@@ -22,17 +22,23 @@ const ev = { mpr: { "2025-12": { period: "2025-12", reportUrl: "https://www.pbc.
 const data = { prices: { rows: [] }, money: { rows: [] }, ev, jev };
 const draft = (entries) => buildDraft({ framework, current, lock, data: { ...data, confirmations: { entries } }, asOf });
 
-test("suggestions exist for all 7 judgement items but are never applied without a decision", () => {
+test("suggestions exist for all 7 judgement items; only P02E may be machine-attested, the rest need a decision", () => {
   const d = draft([]);
   assert.equal(rulesHash(framework), lock.sha256);
-  for (const id of JUDGEMENT_IDS) {
+  const p02e = d.rows.find((r) => r.id === "P02E");
+  assert.ok(["machine-attested", "manual-carry"].includes(p02e.source));
+  if (p02e.source === "machine-attested") {
+    assert.equal(d.observations.P02E.rrrActionLedger.attestation.type, "machine-attested");
+    assert.equal(p02e.suggestion.machineCheck.consistent, true);
+  }
+  for (const id of JUDGEMENT_IDS.filter((x) => x !== "P02E")) {
     const row = d.rows.find((r) => r.id === id);
     assert.equal(row.source, "manual-carry", id);
     assert.equal(row.suggestion.label, "建议(待确认)");
     assert.deepEqual(d.observations[id], current.observations[id], id);
   }
-  assert.equal(d.counts.pendingSuggestions, 7);
-  assert.equal(d.after.score, d.before.score);
+  assert.equal(d.counts.pendingSuggestions, p02e.source === "machine-attested" ? 6 : 7);
+  assert.equal(d.counts.machineAttested, p02e.source === "machine-attested" ? 1 : 0);
 });
 
 test("P02E suggestion is unusable until the user attests, then becomes a valid ledger", () => {

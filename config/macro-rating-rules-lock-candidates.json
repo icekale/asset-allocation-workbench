@@ -1,0 +1,16 @@
+{
+  "note": "候选（未启用）规则版本的冻结哈希；生效锁仍是 config/macro-rating-rules-lock.json(V1.21)。",
+  "candidates": {
+    "V1.22-candidate": {
+      "sha256": "306bfd81271436adc50abeeb699464a241a4c8db6cf0de0ec96e04bd957efc0b",
+      "baseRulesVersion": "V1.21",
+      "baseSha256": "33630d6fd616822af98291fa43fb0543e708431e2b656a865984d090206c594b",
+      "status": "staged-not-active",
+      "changedIndicators": [
+        "F09",
+        "F10"
+      ],
+      "frozenAt": "2026-10-13"
+    }
+  }
+}
