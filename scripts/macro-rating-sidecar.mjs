@@ -17,6 +17,32 @@ let busy = false;
 http.createServer(async (req, res) => {
   const send = (status, body) => { res.writeHead(status, { "content-type": "application/json; charset=utf-8" }); res.end(JSON.stringify(body)); };
   if (req.headers.authorization !== `Bearer ${token}`) return send(401, { error: "unauthorized" });
+  
+  if (req.method === "GET" && req.url === "/attribution") {
+    const history = JSON.parse(fs.readFileSync(path.join(root, "app/data/macro-rating-history.json"), "utf8"));
+    const { attributeHistory } = await import("../lib/macro-rating-attribution.mjs");
+    return send(200, { attributions: attributeHistory(history) });
+  }
+  if (req.method === "POST" && req.url === "/simulate") {
+    let raw = "";
+    for await (const chunk of req) { raw += chunk; if (raw.length > 100_000) return send(413, { error: "请求过大" }); }
+    let body; try { body = JSON.parse(raw || "{}"); } catch { return send(400, { error: "格式错误" }); }
+    const framework = JSON.parse(fs.readFileSync(path.join(root, fs.existsSync(path.join(root, "app/data/macro-rating-v1.22.json")) ? "app/data/macro-rating-v1.22.json" : "app/data/macro-rating-v1.json"), "utf8"));
+    const current = JSON.parse(fs.readFileSync(path.join(root, "app/data/macro-rating-current.json"), "utf8"));
+    const { simulateRating } = await import("../lib/macro-rating-simulate.mjs");
+    return send(200, simulateRating({ framework, current, overrides: body.overrides || {} }));
+  }
+  if (req.method === "GET" && req.url === "/health-sources") {
+    const f = path.join(root, "output/source-health.json");
+    if (!fs.existsSync(f)) return send(404, { error: "尚未生成 source-health.json，请运行 node scripts/source-health.mjs" });
+    return send(200, JSON.parse(fs.readFileSync(f, "utf8")));
+  }
+  if (req.method === "GET" && req.url === "/alerts") {
+    const f = path.join(root, "output/alerts.json");
+    if (!fs.existsSync(f)) return send(404, { error: "尚未生成 alerts.json" });
+    return send(200, JSON.parse(fs.readFileSync(f, "utf8")));
+  }
+
   if (req.method === "GET" && req.url === "/draft") {
     const file = path.join(root, "app/data/macro-rating-draft.json");
     if (!fs.existsSync(file)) return send(404, { draft: null });

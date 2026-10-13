@@ -25,7 +25,7 @@ export default async function RatingDraftPage() {
   const cell = { padding: "4px 8px", borderBottom: "1px solid #eee", textAlign: "left" as const, fontSize: 13 };
   return (
     <main style={{ maxWidth: 1200, margin: "0 auto", padding: 24, fontFamily: "inherit" }}>
-      <p><a href="/">← 返回工作台</a></p>
+      <p><a href="/">← 返回工作台</a> · <a href="/ops">运维健康</a> · <a href="/rating-tools">归因与情景</a></p>
       <h1>待发布评分</h1>
       {!draft ? <p>{status === 404 ? "当前没有待发布的评分草稿。采集 apply 完成后会自动生成。" : `无法读取草稿：${String(body.error ?? status)}`}</p> : (
         <>

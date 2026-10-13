@@ -1,6 +1,6 @@
 # DMIT 采集机说明（179.255.150.134）
 
-仓库：`/root/aaw`（分支 `fix/data-automation`）  
+仓库：`/root/aaw`（分支 `main`（默认分支））  
 密钥：`/root/aaw/.env.caixin`（chmod 600，gitignore；勿提交）  
 门户本地密钥：`/root/aaw/.dev.vars`（chmod 600；勿提交）  
 生产装载：`dist/server/.dev.vars` → 符号链接到 `.dev.vars`（`wrangler dev` 读取；勿提交 `dist/`）  
@@ -82,3 +82,14 @@ DMIT 做法：
 `collect-nbs-gdp-deflator.py` 对国家统计局 SDDS 页做最多 4 次退避重试。若仍失败（偶发空页/WAF），`refresh-official-macro` 记为 **软失败**：保留现有 `macro-gdp-deflator-history.json`，**整次 apply 仍 exit 0**，避免 cron 长期报警。其它采集器失败仍为硬失败。
 
 门户顶部「N 天前更新」读取 `app/data/data-revision.json` 的 `refreshedAt`（官方宏观写入戳），不再误用 D1 种子组合的 `collectedAt`。
+
+
+## 每日备份
+
+包装脚本：`/root/bin/aaw-backup.sh`（源：`collector/dmit/aaw-backup.sh` / `scripts/aaw-backup.sh`）  
+Cron（上海时区非整点）：`17 3 * * *` → `/root/bin/aaw-backup.sh`  
+详情见 `docs/AAW_BACKUP.md`。异地副本需你提供 SSH 授权或 R2 凭证后启用。
+
+## 健康与告警
+
+`node scripts/source-health.mjs` → `output/source-health.json` / `output/alerts.json`；门户 `/ops`。

@@ -79,6 +79,7 @@ prune_logs() {
       timeout 1800 "$NODE" scripts/collect-rating-evidence.mjs || echo "=== rating evidence collection FAILED (draft uses previous evidence) ==="
       timeout 2400 "$NODE" scripts/collect-judgement-evidence.mjs --browserLimit=15 --attachLimit=20 || echo "=== judgement evidence collection FAILED (suggestions use previous evidence) ==="
       "$NODE" scripts/macro-rating-draft.mjs build || echo "=== macro rating draft FAILED ==="
+      "$NODE" scripts/source-health.mjs || echo "=== source-health FAILED ==="
       if [ -f "$AAW/output/macro-rating-draft-notable.json" ]; then
         echo "=== NOTABLE macro rating change: $(cat "$AAW/output/macro-rating-draft-notable.json" | tr -d "\n") ==="
       fi
@@ -92,6 +93,7 @@ prune_logs() {
       ;;
     stale)
       "$NODE" --experimental-strip-types scripts/stale-check.mjs "$AAW/output/stale-check.json" || code=$?
+      "$NODE" scripts/source-health.mjs || true
       ;;
     caixin)
       "$NODE" --experimental-strip-types scripts/caixin-audit.mjs "$AAW/output/caixin-whitelist-audit.json" || code=$?
