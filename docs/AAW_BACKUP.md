@@ -2,7 +2,7 @@
 
 ## 范围
 每日备份（上海时区非整点，默认 **03:17**）：
-- 本地 Miniflare D1 sqlite（`.wrangler/state/v3/d1/...`）
+- 本地 Miniflare D1 sqlite（优先 `/var/lib/aaw/wrangler-state`，兼容旧 `.wrangler/state` / `dist/server/.wrangler/state`）
 - `app/data`（含评分草稿、证据、确认日志等）
 - `output/` 下健康与告警 JSON
 - `.dev.vars` / `.env.caixin` / `.collector.env`：单独用 **age** 加密后放入包内（私钥只在 `/root/.config/aaw-backup/age.key`，**不入库**）
