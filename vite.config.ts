@@ -45,9 +45,13 @@ export default defineConfig(async ({ mode }) => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
-    server: isCodexSeatbeltSandbox
-      ? { watch: { useFsEvents: false, usePolling: true } }
-      : undefined,
+    server: {
+      host: true,
+      allowedHosts: true,
+      ...(isCodexSeatbeltSandbox
+        ? { watch: { useFsEvents: false, usePolling: true } }
+        : {}),
+    },
     plugins: [
       vinext(),
       sites(),
@@ -55,6 +59,8 @@ export default defineConfig(async ({ mode }) => {
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
         config: {
           ...localBindingConfig,
+          // Dev: inject from loadEnv (.env.local / .env). Production build leaves vars empty;
+          // DMIT serves dist via `wrangler dev` which loads `.dev.vars` (never commit).
           vars:
             mode === "development"
               ? {

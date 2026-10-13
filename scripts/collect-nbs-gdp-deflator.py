@@ -3,6 +3,9 @@
 
 2001-2011 uses the 2015 quarterly GDP revision table; 2012 onward uses the
 current NBS SDDS table. The output marks a vintage break at 2011/2012.
+
+The SDDS page occasionally returns empty/WAF HTML ("No tables found"); live
+fetches retry with exponential backoff before failing.
 """
 
 from __future__ import annotations
@@ -12,6 +15,7 @@ import io
 import json
 import re
 import subprocess
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -19,6 +23,10 @@ import pandas as pd
 
 HISTORICAL_URL = "https://www.stats.gov.cn/sj/zxfb/202302/t20230203_1898897.html"
 CURRENT_URL = "https://www.stats.gov.cn/english/Statisticaldata/nsdp/201508/t20150831_1238096.html"
+USER_AGENT = (
+    "Mozilla/5.0 (compatible; AAWCollector/1.0; "
+    "+https://github.com/icekale/asset-allocation-workbench)"
+)
 # Transcribed from the NBS 2015-09-09 quarterly revision table. Each row is
 # year, four current-price amounts (100 million yuan), four real YoY indices (%).
 HISTORICAL_TABLE = """
@@ -37,9 +45,57 @@ HISTORICAL_TABLE = """
 """
 
 
-def read_tables(url: str, snapshot: Path | None = None) -> list[pd.DataFrame]:
-    body = snapshot.read_text() if snapshot else subprocess.check_output(["curl", "-L", "--max-time", "30", "-sS", url]).decode("utf-8", errors="replace")
-    return pd.read_html(io.StringIO(body), flavor="lxml")
+def fetch_html(url: str) -> str:
+    return subprocess.check_output(
+        [
+            "curl",
+            "-L",
+            "--max-time",
+            "45",
+            "-sS",
+            "-A",
+            USER_AGENT,
+            "-H",
+            "Accept-Language: en-US,en;q=0.9,zh-CN;q=0.8",
+            "-H",
+            "Accept: text/html,application/xhtml+xml",
+            url,
+        ]
+    ).decode("utf-8", errors="replace")
+
+
+def read_tables(url: str, snapshot: Path | None = None, attempts: int = 4) -> list[pd.DataFrame]:
+    if snapshot is not None:
+        body = snapshot.read_text()
+        tables = pd.read_html(io.StringIO(body), flavor="lxml")
+        if not tables:
+            raise ValueError(f"No tables found in snapshot {snapshot}")
+        return tables
+
+    last_error: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            body = fetch_html(url)
+            if len(body) < 500 or "<table" not in body.lower():
+                raise ValueError(
+                    f"SDDS HTML looks empty/blocked (len={len(body)}, "
+                    f"has_table={'<table' in body.lower()})"
+                )
+            tables = pd.read_html(io.StringIO(body), flavor="lxml")
+            if not tables:
+                raise ValueError("No tables found")
+            if attempt > 1:
+                print(f"SDDS fetch succeeded on attempt {attempt}")
+            return tables
+        except Exception as error:  # noqa: BLE001 — retry transient NBS/WAF failures
+            last_error = error
+            if attempt >= attempts:
+                break
+            delay = min(2**attempt, 20)
+            print(f"SDDS fetch attempt {attempt}/{attempts} failed: {error}; retry in {delay}s")
+            time.sleep(delay)
+    assert last_error is not None
+    raise last_error
 
 
 def historical() -> dict[str, dict]:
@@ -72,8 +128,10 @@ def historical() -> dict[str, dict]:
     return output
 
 
-def current(snapshot: Path | None = None) -> dict[str, dict]:
-    tables = read_tables(CURRENT_URL, snapshot)
+def current(snapshot: Path | None = None, attempts: int = 4) -> dict[str, dict]:
+    tables = read_tables(CURRENT_URL, snapshot, attempts=attempts)
+    if len(tables) < 7:
+        raise ValueError(f"SDDS expected ≥7 tables, got {len(tables)}")
     nominal: dict[str, float] = {}
     real: dict[str, float] = {}
     for frame, destination in ((tables[5], nominal), (tables[6], real)):
@@ -119,9 +177,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--sdds-file", type=Path, help="Use an already downloaded official SDDS HTML snapshot")
+    parser.add_argument("--attempts", type=int, default=4, help="HTTP fetch attempts for live SDDS page")
     args = parser.parse_args()
     historical_rows = historical()
-    current_rows = current(args.sdds_file)
+    current_rows = current(args.sdds_file, attempts=args.attempts)
     rows = [*historical_rows.values(), *current_rows.values()]
     rows.sort(key=lambda row: row["period"])
     # 定时抓取会随官方发布推进：首期固定、长度不减，末期只要求不早于现有文件

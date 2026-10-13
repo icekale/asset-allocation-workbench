@@ -10,7 +10,9 @@
 - `scripts/caixin-fetch.mjs`：本地调试查询，不会自动改写 `collector/latest-payload.json`。
 - `scripts/caixin-sync.mjs`：受控 Mac collector 通过 `SITE_URL + UPDATE_TOKEN` 调用线上财新代理，针对当前 62 项宏观指标生成可审计匹配报告；不保存或接触 `CAIXIN_API_KEY`，不自动覆盖 payload。
 - `scripts/caixin-map.mjs`：读取脱敏的序列 metadata/search 导出，生成可审计映射报告；不会改写 payload/D1。
-- `config/caixin-series.example.json`：序列到现有指标的映射模板；未确认口径前默认关闭。
+- `config/caixin-series.example.json`：已核验白名单模板（CFETS、中间价、贸易差额、消费者信心、DR007、R007）；复制为被 gitignore 的 `config/caixin-series.json` 后供本地审计使用。
+- `lib/caixin-series-config.ts`：加载白名单、单位换算（如百万美元→亿美元）。
+- `scripts/caixin-audit.mjs`：按白名单拉取财新元数据/最新观测，与 `advisory.json` 只读对比；**不**改写评分、payload 或 D1。
 
 ## 本地配置
 
@@ -39,6 +41,16 @@ node --experimental-strip-types scripts/caixin-fetch.mjs observations <series_id
 - `CAIXIN_API_KEY`：**Secret**，在可见的 Cloudflare Dashboard 中手动输入；不要通过聊天、命令参数或日志传递。
 
 本次只完成本地适配和验证，没有自动把财新序列写进线上评分，也没有覆盖生产 Worker。
+
+
+### 白名单审计（只读）
+
+```bash
+cp config/caixin-series.example.json config/caixin-series.json   # 已被 gitignore
+node --experimental-strip-types scripts/caixin-audit.mjs deliverables/caixin-whitelist-audit.json
+```
+
+报告写入本地 `deliverables/` 或指定路径；对比现有 `currentValue`/`period`，不覆盖 `score` 或其它评分字段。来源优先级仍为官方 → Wind → 财新。
 
 ## 映射边界
 

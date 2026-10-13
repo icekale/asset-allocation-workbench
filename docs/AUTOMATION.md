@@ -9,10 +9,10 @@
 | --- | --- | --- | --- | --- |
 | 指数行情 | 上证指数收盘点位、涨跌幅、观察时间、来源记录 | Cloudflare Cron `10 7 * * 1-5`（北京时间工作日 15:10） | Cloudflare Worker `scheduled` | D1 `dataset_versions`（经 `/api/update` 的同一套校验） |
 | 指数行情（兜底） | 同上 | macOS LaunchAgent，工作日 15:20 | 本机 `scripts/refresh-index.mjs --publish` | 先写 `collector/latest-payload.json`，再 POST `/api/update` |
-| 官方宏观序列 | 统计局价格/平减指数/二手房、人民银行货币与社融、海关社融流量、政策跟踪 | macOS LaunchAgent，每月 16 日、26 日 09:40 | 本机 `scripts/refresh-official-macro.mjs` | `app/data/*.json`（重构建后生效） |
+| 官方宏观序列 | 统计局价格/平减指数/二手房、人民银行货币与社融、海关社融流量、政策跟踪 | macOS LaunchAgent，每月 16 日、26 日 09:40 | 本机 `scripts/refresh-official-macro.mjs` 或 `collector-run.mjs --mode=apply` | `app/data/*.json`（重构建后生效；失败自动回滚） |
+| 编排 / 新鲜度 | 分步 ok/fail 报告、过期检查、财新白名单只读审计 | GitHub Actions `data-refresh.yml`（工作日 + 每月 16/26）；本机可同脚本 | `scripts/collector-run.mjs`（默认 `--mode=audit`） | 只写 `output/collector-last-run.json` 与 artifact；**不**写 D1/评分 |
 
-Wind 与财新仍是**半自动**：脚本只产出可审计候选（`output/wind-*.json`、`output/caixin-sync-report.json`），
-映射与口径确认后才能写进 payload —— 见 `docs/WIND_DATA.md`、`docs/CAIXIN_API.md`。
+来源优先级：**官方原始发布 →（可选）Wind → 财新 API**。本仓库自动化默认 **不用 Wind**；财新仅白名单审计/补缺。见 `docs/WIND_DATA.md`、`docs/CAIXIN_API.md`、下文「编排器」。
 
 ## 指数行情链路
 
@@ -53,6 +53,77 @@ Wind 与财新仍是**半自动**：脚本只产出可审计候选（`output/win
 - 本机：采集失败或出现待人工合并时弹一次桌面通知；日志在
   `/tmp/asset-allocation-official-macro.{out,err}.log` 与 `/tmp/asset-allocation-index-refresh.{out,err}.log`。
 
+
+## 编排器 `collector-run.mjs`
+
+统一入口，两种模式：
+
+| 模式 | 命令 | 写 `app/data`？ | 适用 |
+| --- | --- | --- | --- |
+| `audit`（默认） | `node --experimental-strip-types scripts/collector-run.mjs` | 否（写入 `output/collector-run/<时间戳>/staging/`） | CI、只读体检 |
+| `apply` | `… --mode=apply` | 是（经 `refresh-official-macro.mjs` 备份/回滚） | 能访问官网的本机 |
+
+附加步骤（均可跳过）：
+
+- 财新白名单只读审计：`scripts/caixin-audit.mjs`（需 `CAIXIN_API_KEY` / `.env.caixin`）
+- 新鲜度：`lib/stale-check.mjs`；任一关键序列过期则退出码 **2**
+- 报告：`output/collector-last-run.json`（每步 ok/fail/skip）
+
+```bash
+# CI / 本地只读
+node --experimental-strip-types scripts/collector-run.mjs --mode=audit
+node --experimental-strip-types scripts/stale-check.mjs
+
+# 本机真抓取（不发布、不写 D1）
+node --experimental-strip-types scripts/collector-run.mjs --mode=apply
+```
+
+`audit` 下支持 `--output` 暂存的采集器：价格历史、GDP 平减、社融存量、宏观政策（含 LPR）。其余采集器仅在 `apply`（或直接跑 `refresh-official-macro.mjs`）执行。暂存结果若相对线上 **丢字段或 rows 缩水 >20%**，记为 guard 失败，**不会**建议覆盖。
+
+## GitHub Actions
+
+工作流：`.github/workflows/data-refresh.yml`
+
+- **工作日** 01:00 UTC：过期检查 +（若配置）财新审计；跳过重采集
+- **每月 16/26** 01:40 UTC：同上并尝试 stageable 采集（海外 runner 访问国内官网常失败，默认**不**因采集失败红灯，只因**过期**失败）
+- `workflow_dispatch` 可手动开关采集 / `--strict-collectors`
+- Artifact：`collector-last-run.json`、`stale-check.json`、`output/collector-run/**`
+- **不会**自动 commit `app/data`、不会部署、不会写 D1
+
+### 需要仓库 Secrets（Settings → Secrets and variables → Actions）
+
+| Secret | 必需？ | 说明 |
+| --- | --- | --- |
+| `CAIXIN_API_KEY` | 可选 | 未配置则跳过财新审计 |
+| `CAIXIN_API_BASE_URL` | 可选 | 默认 `https://cxdata.053727.xyz` |
+| `CAIXIN_API_USER_AGENT` | 可选 | 机构标识 |
+
+启用：合并本 PR 后在 Actions 页允许 workflow；首次可手动 **Run workflow**。
+
+人工合并数据：在能访问官网的机器 `--mode=apply` → 检查 diff → 另开数据 PR 或本地构建发布（仍遵守 `AGENTS.md`，不自动改评分）。
+
+## 本机 LaunchAgent / cron
+
+已有：
+
+- `launchd/com.asset-allocation.official-macro.plist` → `refresh-official-macro.mjs`
+- `launchd/com.asset-allocation.index-refresh.plist` → 指数兜底
+
+推荐改用编排器（示例模板）：`launchd/com.asset-allocation.collector-run.plist.example`
+
+```bash
+# 安装原有 launchd
+bash scripts/install-launchd.sh
+
+# 或 cron（Linux 采集机，Asia/Shanghai）
+# 40 9 16,26 * * cd /path/to/repo && /path/to/node --experimental-strip-types scripts/collector-run.mjs --mode=apply >> /tmp/collector-run.log 2>&1
+
+# DMIT（179.255.150.134）本地门户：指数收盘写入 Miniflare D1，见 docs/DMIT_COLLECTOR.md
+# 10 15 * * 1-5 /root/bin/aaw-index-refresh.sh
+```
+
+本机密钥放在被 gitignore 的 `.env.caixin`（或 `.env.local`），**不要**提交。
+
 ## 验证
 
 ```bash
@@ -72,6 +143,11 @@ bash scripts/deploy-cloudflare.sh --dry-run
 
 # 官方宏观抓取（默认不发布）
 node scripts/refresh-official-macro.mjs
+
+# 编排器（audit 不写 app/data；过期退出码 2）
+node --experimental-strip-types scripts/collector-run.mjs --mode=audit --skip-collectors
+node --experimental-strip-types scripts/stale-check.mjs
+
 
 # 单元测试
 node --experimental-strip-types --test tests/index-quote.test.mjs tests/index-refresh.test.mjs

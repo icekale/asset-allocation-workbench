@@ -1,7 +1,7 @@
 export const CAIXIN_DEFAULT_BASE_URL = "https://cxdata.053727.xyz";
-const DEFAULT_TIMEOUT_MS = 10_000;
-const DEFAULT_MAX_RETRIES = 2;
-const MAX_RETRY_DELAY_MS = 4_000;
+const DEFAULT_TIMEOUT_MS = 20_000;
+const DEFAULT_MAX_RETRIES = 3;
+const MAX_RETRY_DELAY_MS = 8_000;
 
 export type CaixinConfig = {
   apiKey: string;
@@ -177,23 +177,39 @@ export async function caixinRequest<T>(
           retryable: true,
         });
       }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        throw new CaixinApiError("财新 API 返回了无法解析的 JSON", {
+          code: "invalid_json",
+          status: response.status,
+          retryable: isRetryableStatus(response.status),
+        });
+      }
+      // Cloudflare/gateway 5xx bodies are JSON but not the Caixin {ok,data,meta} envelope.
+      if (!response.ok) {
+        const maybe = parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : null;
+        const nestedError = maybe && typeof maybe.error === "object" && maybe.error
+          ? maybe.error as { code?: string; message?: string }
+          : null;
+        const code = nestedError?.code === "no_data" ? "no_data" : "upstream_http";
+        throw new CaixinApiError(
+          nestedError?.message || (typeof maybe?.title === "string" ? maybe.title : undefined) || `财新 API HTTP ${response.status}`,
+          {
+            code,
+            status: response.status,
+            requestId: requestId(maybe?.meta as CaixinMeta | undefined),
+            retryable: isRetryableStatus(response.status) || code !== "no_data",
+          },
+        );
+      }
       let envelope: CaixinEnvelope<T>;
       try {
-        envelope = assertEnvelope<T>(JSON.parse(body));
+        envelope = assertEnvelope<T>(parsed);
       } catch (error) {
         if (error instanceof CaixinApiError) throw error;
         throw new CaixinApiError("财新 API 返回了无法解析的 JSON", { code: "invalid_json", status: response.status });
-      }
-      const id = requestId(envelope.meta);
-      if (!response.ok) {
-        const code = envelope.ok === false && envelope.error?.code === "no_data" ? "no_data" : "upstream_http";
-        const message = envelope.ok === false ? envelope.error?.message : undefined;
-        throw new CaixinApiError(message || `财新 API HTTP ${response.status}`, {
-          code,
-          status: response.status,
-          requestId: id,
-          retryable: isRetryableStatus(response.status),
-        });
       }
       if (!envelope.ok) {
         const code = envelope.error?.code === "no_data" ? "no_data" : "upstream_http";
@@ -217,7 +233,7 @@ export async function caixinRequest<T>(
             retryable: true,
           });
       if (!normalized.retryable || attempt >= maxRetries) throw normalized;
-      const delay = Math.max(serverRetryDelay, Math.min(MAX_RETRY_DELAY_MS, 250 * 2 ** attempt));
+      const delay = Math.max(serverRetryDelay, Math.min(MAX_RETRY_DELAY_MS, Math.max(2_000, 250 * 2 ** attempt)));
       await new Promise((resolve) => setTimeout(resolve, delay));
     } finally {
       clearTimeout(timer);
@@ -234,14 +250,41 @@ export function caixinConfigFromValues(values: Record<string, unknown>): CaixinC
   };
 }
 
+export type CaixinSearchPayload = {
+  query?: string;
+  mode?: string;
+  series?: CaixinSeriesSummary[];
+  [key: string]: unknown;
+};
+
+/** Search endpoints return `{ query, mode, series: [...] }` (or occasionally a bare array). */
+export function unwrapCaixinSearchSeries(data: unknown): CaixinSeriesSummary[] {
+  if (Array.isArray(data)) return data as CaixinSeriesSummary[];
+  if (data && typeof data === "object") {
+    const nested = (data as CaixinSearchPayload).series;
+    if (Array.isArray(nested)) return nested;
+  }
+  return [];
+}
+
+/** API country labels use Chinese names; map common ISO codes so callers do not get empty hits. */
+export function normalizeCaixinCountry(country?: string): string | undefined {
+  if (!country) return undefined;
+  const trimmed = country.trim();
+  if (!trimmed) return undefined;
+  const upper = trimmed.toUpperCase();
+  if (upper === "CN" || upper === "CHN" || upper === "CHINA") return "中国";
+  return trimmed;
+}
+
 export async function searchCaixinSeries(query: string, config: CaixinConfig, options: { pageSize?: number; country?: string; tableId?: string } = {}) {
-  const result = await caixinRequest<CaixinSeriesSummary[]>("/v1/series/search", {
+  const result = await caixinRequest<CaixinSearchPayload | CaixinSeriesSummary[]>("/v1/series/search", {
     q: query,
     page_size: options.pageSize ?? 20,
-    country: options.country,
+    country: normalizeCaixinCountry(options.country),
     tb_id: options.tableId,
   }, config);
-  return { series: result.data, meta: result.meta };
+  return { series: unwrapCaixinSearchSeries(result.data), meta: result.meta, raw: result.data };
 }
 
 export async function getCaixinSeries(seriesId: string, config: CaixinConfig) {

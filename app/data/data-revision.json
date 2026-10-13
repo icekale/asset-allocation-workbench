@@ -1,0 +1,16 @@
+{
+  "refreshedAt": "2026-10-12T15:30:55.461Z",
+  "timezone": "Asia/Shanghai",
+  "source": "refresh-official-macro",
+  "changed": [
+    "macro-price-history.json",
+    "macro-secondhand-price.json",
+    "macro-money-supply.json",
+    "macro-finance-credit.json",
+    "macro-social-financing.json",
+    "macro-policy.json"
+  ],
+  "softFailed": [],
+  "hardFailed": [],
+  "note": "Seeded after 2026-10-12 DMIT apply; GDP deflator revalidated unchanged (2026-Q2)."
+}

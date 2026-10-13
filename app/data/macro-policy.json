@@ -1,5 +1,111 @@
 {
-  "updated": "2026-10-01",
+  "fundingRate": {
+    "basis": "DR007为银行间存款类机构以利率债为质押的7天回购月加权平均利率；政策利率为当月最后一次可得的央行7天逆回购操作利率。二者同月比较，均为年化百分比；不把DR007当成政策利率。",
+    "provider": "Wind EDB",
+    "originalPublisher": "中国人民银行",
+    "dr007Code": "R0633988",
+    "policyRateCode": "M0041371",
+    "dr007WindUpdatedAt": "2026-09-22",
+    "policyRateWindUpdatedAt": "2026-09-29",
+    "unit": "%",
+    "officialOverlap": [
+      {
+        "period": "2026-06",
+        "dr007": 1.45,
+        "url": "https://www.cnafc.org/cnafc/front/detail.action?id=AA5CABD5E856472CA719DCDBFCC205B2"
+      },
+      {
+        "period": "2026-08",
+        "dr007": 1.4,
+        "url": "https://dfjrjgj.hlj.gov.cn/hljjrjd/c113262/202609/c00_31978297.shtml"
+      }
+    ],
+    "policyRateOfficialReference": "https://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125431/125475/2025111413260240402/index.html",
+    "rows": [
+      {
+        "period": "2026-01",
+        "dr007": 1.51,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-02",
+        "dr007": 1.49,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-03",
+        "dr007": 1.44,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-04",
+        "dr007": 1.35,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-05",
+        "dr007": 1.35,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-06",
+        "dr007": 1.45,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-07",
+        "dr007": 1.43,
+        "policyRate": 1.4
+      },
+      {
+        "period": "2026-08",
+        "dr007": 1.4,
+        "policyRate": 1.4
+      }
+    ]
+  },
+  "specialBondIssuance": {
+    "basis": "2026年新增地方政府专项债券发行额，年初累计，单位亿元；仅含新增专项债，不含再融资专项债。债券发行不等于资金已支出或形成实物工作量。",
+    "source": "财政部债务管理司地方政府债券发行和债务余额月报",
+    "rows": [
+      {
+        "period": "2026-02",
+        "amount": 8242,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202604/t20260410_3987362.htm"
+      },
+      {
+        "period": "2026-03",
+        "amount": 11599,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202605/t20260508_3989284.htm"
+      },
+      {
+        "period": "2026-04",
+        "amount": 13343,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202606/t20260611_3991502.htm"
+      },
+      {
+        "period": "2026-05",
+        "amount": 14951,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202606/t20260624_3992154.htm"
+      },
+      {
+        "period": "2026-06",
+        "amount": 20667,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202607/t20260727_3994357.htm"
+      },
+      {
+        "period": "2026-07",
+        "amount": 24080,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202609/t20260909_3997013.htm"
+      },
+      {
+        "period": "2026-08",
+        "amount": 29293,
+        "url": "https://zwgls.mof.gov.cn/tjsj/202609/t20260924_3998108.htm"
+      }
+    ]
+  },
+  "updated": "2026-10-12",
   "lpr": {
     "basis": "贷款市场报价利率，月度公布；2019年8月新机制起独立展示",
     "source": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/LprHis",
@@ -1757,112 +1863,6 @@
         "income": 5.7,
         "expense": 1.2,
         "url": "https://gks.mof.gov.cn/tongjishuju/202609/t20260918_3997709.htm"
-      }
-    ]
-  },
-  "fundingRate": {
-    "basis": "DR007为银行间存款类机构以利率债为质押的7天回购月加权平均利率；政策利率为当月最后一次可得的央行7天逆回购操作利率。二者同月比较，均为年化百分比；不把DR007当成政策利率。",
-    "provider": "Wind EDB",
-    "originalPublisher": "中国人民银行",
-    "dr007Code": "R0633988",
-    "policyRateCode": "M0041371",
-    "dr007WindUpdatedAt": "2026-09-22",
-    "policyRateWindUpdatedAt": "2026-09-29",
-    "unit": "%",
-    "officialOverlap": [
-      {
-        "period": "2026-06",
-        "dr007": 1.45,
-        "url": "https://www.cnafc.org/cnafc/front/detail.action?id=AA5CABD5E856472CA719DCDBFCC205B2"
-      },
-      {
-        "period": "2026-08",
-        "dr007": 1.4,
-        "url": "https://dfjrjgj.hlj.gov.cn/hljjrjd/c113262/202609/c00_31978297.shtml"
-      }
-    ],
-    "policyRateOfficialReference": "https://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125431/125475/2025111413260240402/index.html",
-    "rows": [
-      {
-        "period": "2026-01",
-        "dr007": 1.51,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-02",
-        "dr007": 1.49,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-03",
-        "dr007": 1.44,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-04",
-        "dr007": 1.35,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-05",
-        "dr007": 1.35,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-06",
-        "dr007": 1.45,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-07",
-        "dr007": 1.43,
-        "policyRate": 1.4
-      },
-      {
-        "period": "2026-08",
-        "dr007": 1.4,
-        "policyRate": 1.4
-      }
-    ]
-  },
-  "specialBondIssuance": {
-    "basis": "2026年新增地方政府专项债券发行额，年初累计，单位亿元；仅含新增专项债，不含再融资专项债。债券发行不等于资金已支出或形成实物工作量。",
-    "source": "财政部债务管理司地方政府债券发行和债务余额月报",
-    "rows": [
-      {
-        "period": "2026-02",
-        "amount": 8242,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202604/t20260410_3987362.htm"
-      },
-      {
-        "period": "2026-03",
-        "amount": 11599,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202605/t20260508_3989284.htm"
-      },
-      {
-        "period": "2026-04",
-        "amount": 13343,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202606/t20260611_3991502.htm"
-      },
-      {
-        "period": "2026-05",
-        "amount": 14951,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202606/t20260624_3992154.htm"
-      },
-      {
-        "period": "2026-06",
-        "amount": 20667,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202607/t20260727_3994357.htm"
-      },
-      {
-        "period": "2026-07",
-        "amount": 24080,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202609/t20260909_3997013.htm"
-      },
-      {
-        "period": "2026-08",
-        "amount": 29293,
-        "url": "https://zwgls.mof.gov.cn/tjsj/202609/t20260924_3998108.htm"
       }
     ]
   },

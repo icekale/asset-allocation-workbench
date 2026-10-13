@@ -1,0 +1,54 @@
+{
+  "note": "Official MOF/SCIO/People's Daily statements on special-bond issuance/use/disbursement. No monthly national use series found on MOF/NDRC/celma/Caixin; these are dated structured statements. Evidence only. celma.org.cn is per-province issuance disclosure, not a national use series. NDRC pages checked are investment-guidance / 两新 funds, not a special-bond use series. CNR reprint of Q1 MOF conference is GBK-encoded and redundant with the MOF original transcript.",
+  "items": [
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202604/t20260424_3988407.htm",
+      "publisher": "财政部（2026年一季度财政收支情况新闻发布会文字实录）",
+      "releaseDate": "2026-04-24"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202607/t20260722_3994019.htm",
+      "publisher": "财政部（2026年上半年财政收支情况新闻发布会文字实录）",
+      "releaseDate": "2026-07-22"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202608/t20260821_3995927.htm",
+      "publisher": "财政部（国新办「开局起步十五五」系列主题新闻发布会文字实录）",
+      "releaseDate": "2026-08-21"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202610/t20261009_4002434.htm",
+      "publisher": "财政部（2026年上半年中国财政政策执行情况报告）",
+      "releaseDate": "2026-10-09"
+    },
+    {
+      "url": "https://finance.sina.com.cn/jjxw/2026-10-09/doc-iniuqiyp4079891.shtml",
+      "publisher": "新浪财经转载人民日报《更好发挥专项债促投资作用》（政策解读，转述财政部）",
+      "releaseDate": "2026-10-09",
+      "sourceKind": "repost"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202510/t20251017_3974415.htm",
+      "publisher": "财政部（2025年前三季度财政收支情况新闻发布会文字实录）",
+      "releaseDate": "2025-10-17"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202507/t20250725_3968586.htm",
+      "publisher": "财政部（2025年上半年财政收支情况新闻发布会文字实录）",
+      "releaseDate": "2025-07-25"
+    },
+    {
+      "url": "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202603/t20260317_3985436.htm",
+      "publisher": "财政部（2025年中国财政政策执行情况报告）",
+      "releaseDate": "2026-03-17"
+    }
+  ],
+  "celmaNote": {
+    "url": "https://www.celma.org.cn/",
+    "conclusion": "中国地方政府债券信息公开平台（celma）公开各省市发行前披露与发行结果，无全国统一的专项债「使用/拨付」月度序列"
+  },
+  "ndrcNote": {
+    "url": "https://www.ndrc.gov.cn/",
+    "conclusion": "发改委公开页主要为投资指引与超长期特别国债「两新」资金下达，未见全国专项债「使用/拨付」月度序列；专项债使用进度以财政部新闻发布会/财政政策执行报告口径为准"
+  }
+}

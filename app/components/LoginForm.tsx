@@ -15,6 +15,7 @@ export function LoginForm() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ password }),
       });
       if (!response.ok) {
@@ -50,7 +51,7 @@ export function LoginForm() {
             autoFocus
           />
           {error ? <p className="form-error" role="alert">{error}</p> : null}
-          <button type="submit" disabled={loading || !password}>
+          <button type="submit" disabled={loading}>
             {loading ? "正在验证…" : "进入系统"}
           </button>
         </form>

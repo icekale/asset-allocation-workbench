@@ -1,13 +1,93 @@
 {
+  "version": 1,
+  "policy": "官方原始发布 → Wind → 财新。本白名单仅在官方/Wind 缺口时作为财新补充候选；审计脚本只读对比，不自动覆盖 advisory、评分或 D1。",
   "series": [
     {
-      "id": "<series_id>",
-      "name": "<先用 search 命令确认的指标名>",
+      "id": "3825201",
+      "name": "人民币汇率:中间价:美元",
       "target": "macroIndicators",
-      "targetKey": "<现有指标键>",
+      "targetKey": "M11",
+      "frequency": "D",
+      "unit": "人民币/美元",
+      "expectedSource": "中国外汇交易中心",
+      "enabled": true,
+      "scale": 1,
+      "notes": "已核验 has_data；与工作台日度中间价口径一致。优先仍用外管局/货币网官方；官方缺失时用财新。"
+    },
+    {
+      "id": "372565287",
+      "name": "CFETS人民币汇率指数",
+      "target": "macroIndicators",
+      "targetKey": "M12",
+      "frequency": "D",
+      "unit": "指数",
+      "expectedSource": "中国外汇交易中心",
+      "enabled": true,
+      "scale": 1,
+      "frequencyNote": "工作台标注周度；财新日度可取周末或最新交易日作审计对照，正式入库前需与官方周度核对。",
+      "notes": "备选月度序列 372565257。官方周度优先；日度用于缺口补齐。"
+    },
+    {
+      "id": "6094301",
+      "name": "进出口差额（海关）",
+      "target": "macroIndicators",
+      "targetKey": "M13",
       "frequency": "M",
-      "enabled": false,
-      "notes": "只有确认序列 has_data=true、单位/频率/来源和现有指标口径一致后，才将 enabled 改为 true。"
+      "unit": "百万美元",
+      "workbenchUnit": "亿美元",
+      "expectedSource": "海关总署",
+      "enabled": true,
+      "scale": 0.01,
+      "notes": "财新单位百万美元，工作台为亿美元，观测值需 ×0.01。与 M43 共用同一序列。"
+    },
+    {
+      "id": "6094301",
+      "name": "进出口差额（海关）",
+      "target": "macroIndicators",
+      "targetKey": "M43",
+      "frequency": "M",
+      "unit": "百万美元",
+      "workbenchUnit": "亿美元",
+      "expectedSource": "海关总署",
+      "enabled": true,
+      "scale": 0.01,
+      "notes": "同 M13；货物贸易顺差/贸易差额共用海关差额序列。"
+    },
+    {
+      "id": "5198401",
+      "name": "消费者信心指数",
+      "target": "macroIndicators",
+      "targetKey": "M20",
+      "frequency": "M",
+      "unit": "指数",
+      "expectedSource": "国家统计局",
+      "enabled": true,
+      "scale": 1,
+      "notes": "已有 refresh-consumer-confidence.mjs 路径；官方答记者问优先，财新补缺。CCI_SKIP_WIND=1 可跳过 Wind。"
+    },
+    {
+      "id": "388484397",
+      "name": "DR007",
+      "target": "macroIndicators",
+      "targetKey": "M62",
+      "frequency": "D",
+      "unit": "%",
+      "expectedSource": "中国货币网",
+      "enabled": true,
+      "scale": 1,
+      "notes": "银行间存款类机构质押式回购加权利率（7天）。官方货币网优先。"
+    },
+    {
+      "id": "3798401",
+      "name": "银行间债券质押式回购利率:加权平均:(R007)7天",
+      "target": "macroIndicators",
+      "targetKey": "M63",
+      "frequency": "D",
+      "unit": "年利率%",
+      "expectedSource": "中国货币网",
+      "enabled": true,
+      "scale": 1,
+      "notes": "全市场 R007 日度；月度备选 7061001。官方货币网优先。"
     }
   ]
 }

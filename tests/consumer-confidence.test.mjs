@@ -44,3 +44,29 @@ test("merges by official, Wind, then Caixin priority and reports missing months"
     expected: 4, found: 3, missing: ["2020-04"],
   });
 });
+
+test("appendToIntrayear only appends newer months and never rewrites history", async () => {
+  const { appendToIntrayear } = await import("../lib/consumer-confidence.mjs");
+  const target = { periods: ["6月", "7月"], values: [89.4, 89.2] };
+  const recs = [
+    { period: "2026-05", value: 89.9, sourceId: "财新序列 5198401" },
+    { period: "2026-07", value: 99, sourceId: "财新序列 5198401" },
+    { period: "2026-08", value: 89.5, sourceId: "财新序列 5198401", source: "国家统计局" },
+  ];
+  const { target: out, appended, conflicts } = appendToIntrayear(target, recs, 2026);
+  assert.deepEqual(out.periods, ["6月", "7月", "8月"]);
+  assert.deepEqual(out.values, [89.4, 89.2, 89.5]);
+  assert.equal(appended.length, 1);
+  assert.deepEqual(conflicts, [{ period: "2026-07", kept: 89.2, offered: 99, sourceId: "财新序列 5198401" }]);
+  assert.deepEqual(target.periods, ["6月", "7月"]);
+  const y = appendToIntrayear(out, [{ period: "2027-01", value: 90, sourceId: "x" }], 2026);
+  assert.equal(y.target.periods.at(-1), "2027年1月");
+});
+
+test("spliceSeriesText rewrites only the target series object", async () => {
+  const { spliceSeriesText } = await import("../lib/consumer-confidence.mjs");
+  const text = '{\n  "series": [\n    { "metric": "A", "values": [1, 2] },\n    {\n      "metric": "消费者信心指数", "values": [1]\n    }\n  ]\n}\n';
+  const out = spliceSeriesText(text, "消费者信心指数", { metric: "消费者信心指数", values: [1, 2] });
+  assert.ok(out.includes('{ "metric": "A", "values": [1, 2] }'));
+  assert.deepEqual(JSON.parse(out).series[1].values, [1, 2]);
+});

@@ -48,3 +48,15 @@ test("treats HTML challenge pages as an upstream error", async () => {
     (error) => error instanceof CaixinApiError && error.code === "upstream_html",
   );
 });
+
+test("retries Cloudflare gateway 504 JSON that is not a Caixin envelope", async () => {
+  let calls = 0;
+  const result = await getCaixinObservations("5198401", { apiKey: "test-key", maxRetries: 2, fetchImpl: async () => {
+    calls += 1;
+    return calls < 3
+      ? new Response(JSON.stringify({ type: "https://developers.cloudflare.com/", title: "Error 504: Gateway time-out", status: 504 }), { status: 504, headers: { "content-type": "application/json" } })
+      : response({ ok: true, data: { series_id: "5198401", name: "消费者信心指数", observations: [["2026-08-01", 89.5]] }, meta: { request_id: "req-ok" } });
+  } });
+  assert.equal(calls, 3);
+  assert.equal(result.series.observations[0].value, 89.5);
+});

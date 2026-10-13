@@ -54,3 +54,16 @@ next-env.d.ts
 # Python caches
 __pycache__/
 *.py[cod]
+
+# Local Caixin series whitelist (copy from example; never commit live mappings with secrets)
+/config/caixin-series.json
+/deliverables/
+
+# macro rating draft (runtime)
+/app/data/macro-rating-draft.json
+/app/data/*.tmp
+/.rating-sidecar.env
+/app/data/macro-rating-evidence.json
+/output/rating-evidence-cache/
+/app/data/macro-rating-judgement-evidence.json
+/app/data/macro-rating-confirmations.json

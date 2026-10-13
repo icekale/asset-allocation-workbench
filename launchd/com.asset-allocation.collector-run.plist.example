@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 编排器：官方采集 apply + 财新只读审计 + 过期检查。不部署、不写 D1。
+     复制为 com.asset-allocation.collector-run.plist 并替换 ABSOLUTE 路径后
+     launchctl bootstrap gui/$UID <plist> -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.asset-allocation.collector-run</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-lc</string>
+    <string>/ABSOLUTE/PATH/TO/node --experimental-strip-types /ABSOLUTE/PATH/TO/scripts/collector-run.mjs --mode=apply</string>
+  </array>
+  <key>WorkingDirectory</key><string>/ABSOLUTE/PATH/TO/asset-allocation-workbench</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PYTHON</key><string>/ABSOLUTE/PATH/TO/python3</string>
+    <key>CAIXIN_ENV_FILE</key><string>/ABSOLUTE/PATH/TO/.env.caixin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Day</key><integer>16</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>40</integer></dict>
+    <dict><key>Day</key><integer>26</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>40</integer></dict>
+  </array>
+  <key>StandardOutPath</key><string>/tmp/asset-allocation-collector-run.out.log</string>
+  <key>StandardErrorPath</key><string>/tmp/asset-allocation-collector-run.err.log</string>
+</dict>
+</plist>

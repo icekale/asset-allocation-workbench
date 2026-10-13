@@ -1,0 +1,122 @@
+# Macro data freshness + dry collector / Caixin audit.
+# Safer default: does NOT commit app/data or write D1. Uploads report artifacts.
+# Local trusted machines use LaunchAgent + `collector-run.mjs --mode=apply` (see docs/AUTOMATION.md).
+name: data-refresh
+
+on:
+  schedule:
+    # Weekdays 01:00 UTC ≈ 09:00 Asia/Shanghai — stale + optional Caixin audit
+    - cron: "0 1 * * 1-5"
+    # Monthly 16th & 26th 01:40 UTC ≈ 09:40 Asia/Shanghai — also attempt dry collectors
+    - cron: "40 1 16,26 * *"
+  workflow_dispatch:
+    inputs:
+      run_collectors:
+        description: "Run stageable official collectors into staging (may fail outside CN network)"
+        type: boolean
+        default: true
+      strict_collectors:
+        description: "Fail the job when a collector step fails"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install light Python deps for stageable collectors
+        run: pip install --quiet openpyxl pandas lxml || true
+
+      - name: Prepare Caixin env (optional secret)
+        env:
+          CAIXIN_API_KEY: ${{ secrets.CAIXIN_API_KEY }}
+          CAIXIN_API_BASE_URL: ${{ secrets.CAIXIN_API_BASE_URL }}
+          CAIXIN_API_USER_AGENT: ${{ secrets.CAIXIN_API_USER_AGENT }}
+        run: |
+          mkdir -p output
+          if [ -n "${CAIXIN_API_KEY}" ]; then
+            {
+              echo "CAIXIN_API_KEY=${CAIXIN_API_KEY}"
+              echo "CAIXIN_API_BASE_URL=${CAIXIN_API_BASE_URL:-https://cxdata.053727.xyz}"
+              echo "CAIXIN_API_USER_AGENT=${CAIXIN_API_USER_AGENT:-asset-allocation-gha/1.0}"
+            } > .env.caixin
+            chmod 600 .env.caixin
+            echo "Caixin secret present — audit will run."
+          else
+            echo "CAIXIN_API_KEY secret not set — Caixin audit will be skipped."
+          fi
+
+      - name: Stale check (hard gate)
+        id: stale
+        continue-on-error: true
+        run: node --experimental-strip-types scripts/stale-check.mjs output/stale-check.json
+
+      - name: Collector audit run
+        id: collector
+        env:
+          COLLECTOR_LAST_RUN: output/collector-last-run.json
+          # GHA usually cannot reach CN official sites; keep collector failures soft unless requested.
+        run: |
+          set +e
+          EXTRA=()
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # cron: weekdays → skip heavy collectors; monthly days → attempt staging collectors
+            DAY=$(date -u +%d)
+            if [ "$DAY" != "16" ] && [ "$DAY" != "26" ]; then
+              EXTRA+=(--skip-collectors)
+            fi
+          else
+            if [ "${{ inputs.run_collectors }}" != "true" ]; then
+              EXTRA+=(--skip-collectors)
+            fi
+          fi
+          if [ "${{ inputs.strict_collectors }}" = "true" ]; then
+            EXTRA+=(--strict-collectors)
+          fi
+          node --experimental-strip-types scripts/collector-run.mjs --mode=audit --fail-on-stale=false "${EXTRA[@]}"
+          code=$?
+          echo "collector_exit=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collector-audit-${{ github.run_id }}
+          path: |
+            output/collector-last-run.json
+            output/stale-check.json
+            output/collector-run/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Fail when data is stale
+        if: steps.stale.outcome == 'failure'
+        run: |
+          echo "::error::Macro series are stale — see stale-check artifact. Human should refresh on a CN-network machine (collector-run --mode=apply) and open a data PR if needed."
+          exit 1
+
+      - name: Cleanup secrets from workspace
+        if: always()
+        run: rm -f .env.caixin

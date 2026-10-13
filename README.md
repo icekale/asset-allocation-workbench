@@ -51,7 +51,8 @@ bash scripts/deploy-cloudflare.sh
 ## 自动更新
 
 - 上证指数收盘行情：Cloudflare Cron 在工作日北京时间 15:10 触发 Worker `scheduled`，三源交叉核验（腾讯/新浪/东方财富，偏差上限 0.2%）后写入 D1；本机 LaunchAgent 15:20 兜底。
-- 官方宏观序列：本机 LaunchAgent 每月 16 日、26 日运行 `scripts/refresh-official-macro.mjs`，只抓取与比对，结构不兼容时自动回滚并留下待人工合并的副本。
+- 官方宏观序列：本机 LaunchAgent 每月 16 日、26 日运行 `scripts/refresh-official-macro.mjs`（或 `collector-run.mjs --mode=apply`），只抓取与比对，结构不兼容时自动回滚并留下待人工合并的副本。
+- 编排与新鲜度：`scripts/collector-run.mjs`（默认 audit，不写 `app/data`）+ GitHub Actions `data-refresh.yml`；报告见 `output/collector-last-run.json`。详情 `docs/AUTOMATION.md`。
 - 指数抓取单测：`npm run test:automation`；安装定时任务：`npm run launchd:install`。
 - 数据新鲜度：`/api/health` 返回 `asOf`、`ageHours`、`stale`，可直接接入监控。
 

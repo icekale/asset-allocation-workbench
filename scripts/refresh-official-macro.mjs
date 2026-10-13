@@ -29,7 +29,8 @@ const NOTIFY_TIMEOUT_MS = 10_000;
 /** 顺序即执行顺序：串行运行，避免同时改写文件或对官网并发施压。requires 为第三方模块。 */
 const collectors = [
   { script: "scripts/collect-nbs-price-history.py", args: ["--output", "app/data/macro-price-history.json", "--start-year", "2010", "--end-year", String(new Date().getFullYear())], requires: [] },
-  { script: "scripts/collect-nbs-gdp-deflator.py", args: ["--output", "app/data/macro-gdp-deflator-history.json"], requires: ["pandas"] },
+  // NBS SDDS HTML intermittently empty/WAF — soft so one miss does not fail the whole apply cron.
+  { script: "scripts/collect-nbs-gdp-deflator.py", args: ["--output", "app/data/macro-gdp-deflator-history.json"], requires: ["pandas"], soft: true },
   { script: "scripts/collect-nbs-secondhand-price.py", args: ["--end", previousMonth], requires: ["lxml"] },
   { script: "scripts/collect-pbc-money-supply.py", args: [], requires: [] },
   { script: "scripts/collect-pbc-credit.py", args: [], requires: [] },
@@ -37,6 +38,9 @@ const collectors = [
   { script: "scripts/collect-mofcom-social-financing-flow.py", args: [], requires: [] },
   { script: "scripts/collect-macro-policy.py", args: [], requires: ["openpyxl"] },
 ];
+
+/** Collectors whose transient failure must not make cron exit 1 (existing app/data kept). */
+const softCollectorScripts = new Set(collectors.filter((c) => c.soft).map((c) => c.script));
 
 /**
  * 采集器抓取范围小于线上序列的文件，按 period 增量合并而不是整体替换：
@@ -168,8 +172,9 @@ for (const collector of collectors) {
   }
   const started = Date.now();
   const { ok, output, code } = await run(python, [collector.script, ...collector.args], { timeoutMs: COLLECTOR_TIMEOUT_MS });
-  results.push({ script: collector.script, status: ok ? "ok" : "failed", code, durationMs: Date.now() - started, output: output.trim().slice(0, 4_000) });
-  console.log(`${ok ? "ok  " : "FAIL"} ${collector.script} (${Date.now() - started}ms)`);
+  const soft = Boolean(collector.soft);
+  results.push({ script: collector.script, status: ok ? "ok" : "failed", soft, code, durationMs: Date.now() - started, output: output.trim().slice(0, 4_000) });
+  console.log(`${ok ? "ok  " : soft ? "SOFT" : "FAIL"} ${collector.script} (${Date.now() - started}ms)`);
 }
 
 const after = await snapshot(dataDir);
@@ -205,24 +210,45 @@ for (const [name, buffer] of after) {
 }
 
 const failed = results.filter((result) => result.status === "failed");
+const hardFailed = failed.filter((result) => !result.soft && !softCollectorScripts.has(result.script));
+const softFailed = failed.filter((result) => result.soft || softCollectorScripts.has(result.script));
 const skipped = results.filter((result) => result.status === "skipped");
 const summary = {
   generatedAt: new Date().toISOString(),
   python,
   collectors: results.length,
   failed: failed.map((result) => result.script),
+  hardFailed: hardFailed.map((result) => result.script),
+  softFailed: softFailed.map((result) => result.script),
   skipped: skipped.map((result) => result.script),
   changed,
   pending,
   deployed: false,
 };
 
+// Stamp last successful apply (any hard-ok write) for portal freshness label.
+if (!hardFailed.length && (changed.length || softFailed.length || results.some((r) => r.status === "ok"))) {
+  const revision = {
+    refreshedAt: summary.generatedAt,
+    timezone: "Asia/Shanghai",
+    source: "refresh-official-macro",
+    changed,
+    softFailed: summary.softFailed,
+    hardFailed: summary.hardFailed,
+  };
+  await fs.writeFile(
+    path.join(dataDir, "data-revision.json"),
+    `${JSON.stringify(revision, null, 2)}\n`,
+  );
+  if (!changed.includes("data-revision.json")) changed.push("data-revision.json");
+}
+
 const reportPath = path.join(runDir, "report.md");
 await fs.mkdir(runDir, { recursive: true });
 await fs.writeFile(reportPath, [
   `# 官方宏观数据抓取报告 ${summary.generatedAt}`,
   "",
-  `- 采集器：${summary.collectors} 个，失败 ${failed.length} 个，跳过 ${skipped.length} 个`,
+  `- 采集器：${summary.collectors} 个，硬失败 ${hardFailed.length} 个，软失败 ${softFailed.length} 个，跳过 ${skipped.length} 个`,
   `- 已更新：${changed.length ? changed.join("、") : "无"}`,
   `- 待人工合并：${pending.length ? pending.map((item) => `${item.file}（${item.reason}）`).join("；") : "无"}`,
   "",
@@ -238,7 +264,7 @@ await fs.writeFile(reportPath, [
   ]),
 ].join("\n"));
 
-if (deploy && !failed.length && !skipped.length && !pending.length && changed.length) {
+if (deploy && !hardFailed.length && !skipped.length && !pending.length && changed.length) {
   const deployed = await run("bash", ["scripts/deploy-cloudflare.sh"], { timeoutMs: 30 * 60_000 });
   summary.deployed = deployed.ok;
   await fs.appendFile(reportPath, `\n## 发布\n\n${deployed.ok ? "deploy-cloudflare.sh 成功" : "deploy-cloudflare.sh 失败"}\n\n\`\`\`\n${deployed.output.slice(0, 4_000)}\n\`\`\`\n`);
@@ -247,11 +273,12 @@ if (deploy && !failed.length && !skipped.length && !pending.length && changed.le
   console.log("跳过发布：存在失败、依赖缺失或待人工合并的文件，或本轮没有数据变化。");
 }
 
-// 最低成本的无人值守提醒：抓取失败、依赖缺失或出现待人工合并时弹一次桌面通知。
-if ((failed.length || skipped.length || pending.length) && process.platform === "darwin") {
-  const message = `${failed.length + skipped.length} 个采集器未完成，${pending.length} 个文件待人工合并`;
+// 最低成本的无人值守提醒：硬失败、依赖缺失或出现待人工合并时弹一次桌面通知。
+if ((hardFailed.length || skipped.length || pending.length) && process.platform === "darwin") {
+  const message = `${hardFailed.length + skipped.length} 个采集器硬失败/跳过，${softFailed.length} 个软失败，${pending.length} 个文件待人工合并`;
   await run("osascript", ["-e", `display notification "${message}" with title "资产配置工作台·官方数据"`], { timeoutMs: NOTIFY_TIMEOUT_MS });
 }
 
 console.log(JSON.stringify({ ...summary, reportPath }));
-process.exit(failed.length ? 1 : 0);
+// Soft-only failures keep existing files and must not make cron exit 1 forever.
+process.exit(hardFailed.length || pending.length ? 1 : 0);

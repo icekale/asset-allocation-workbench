@@ -171,9 +171,21 @@ def imf_rows():
     raise RuntimeError("IMF 中国广义政府净借入/GDP 序列缺失")
 
 
-def main():
-    data = {
-        "updated": "2026-10-01",
+OWNED_KEYS = {
+    "updated",
+    "lpr",
+    "bond",
+    "fiscal",
+    "deficitTarget",
+    "imfDeficit",
+    "mlfNote",
+}
+
+
+def build_owned_payload():
+    from datetime import date
+    return {
+        "updated": date.today().isoformat(),
         "lpr": {"basis": "贷款市场报价利率，月度公布；2019年8月新机制起独立展示", "source": LPR_ENDPOINT, "rows": lpr_rows()},
         "bond": {"basis": "中债国债到期收益率曲线，每月最后可得交易日观测，单位%", "source": BOND_ENDPOINT, "rows": bond_rows()},
         "fiscal": {"basis": "全国一般公共预算收入和支出，年初累计同比；1—2月合并，单位%", "source": FISCAL_INDEX, "rows": fiscal_rows()},
@@ -187,22 +199,52 @@ def main():
         "imfDeficit": {"basis": "IMF WEO 2026年4月版广义政府净借入占GDP比重取正值；与中国预算赤字率目标口径不同，不可直接相减；原表最新实际年度为2024年，2025年及以后为估计或预测，单位%", "source": IMF_EXCEL, "rows": imf_rows()},
         "mlfNote": {"text": "2025年3月起中期借贷便利改为多重价位中标，不再有统一中标利率；不把MLF价格与LPR续成一条可比曲线。", "url": "https://www.pbc.gov.cn/zhengcehuobisi/125207/125227/125957/f5c4690f2cbd40918bf24c2d39ac58af/2025091218344076234/2025081517321679368.pdf"},
     }
-    assert len(data["lpr"]["rows"]) >= 80
-    assert len(data["bond"]["rows"]) >= 100
-    assert len(data["fiscal"]["rows"]) >= 7
-    assert len(data["imfDeficit"]["rows"]) >= 20
-    # 定时抓取会整体重写该文件：继承本脚本不产出的字段（fundingRate、
-    # specialBondIssuance 等由其它来源维护的序列），避免覆盖时静默丢序列。
-    if OUTPUT.exists():
-        try:
-            previous = json.loads(OUTPUT.read_text())
-        except (json.JSONDecodeError, OSError):
-            previous = None
-        if isinstance(previous, dict):
-            data = {**previous, **data}
-    OUTPUT.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
-    print("LPR", len(data["lpr"]["rows"]), "bond", len(data["bond"]["rows"]), "fiscal", len(data["fiscal"]["rows"]), "IMF", len(data["imfDeficit"]["rows"]))
+def main(force=False, output=None):
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from json_merge_guard import (
+        add_force_argument,
+        load_existing,
+        merge_preserve,
+        never_move_updated_backwards,
+        write_merged,
+    )
+
+    owned = build_owned_payload()
+    assert len(owned["lpr"]["rows"]) >= 80
+    assert len(owned["bond"]["rows"]) >= 100
+    assert len(owned["fiscal"]["rows"]) >= 7
+    assert len(owned["imfDeficit"]["rows"]) >= 20
+
+    baseline = load_existing(OUTPUT)
+    never_move_updated_backwards(baseline, owned)
+    merged = merge_preserve(
+        baseline,
+        owned,
+        owned_keys=OWNED_KEYS,
+        force=force,
+        series_paths=[("lpr", "rows"), ("bond", "rows"), ("fiscal", "rows"), ("imfDeficit", "rows")],
+    )
+    target = output or OUTPUT
+    write_merged(target, merged)
+    preserved = sorted(set(merged) - OWNED_KEYS)
+    print(
+        "LPR", len(merged["lpr"]["rows"]),
+        "bond", len(merged["bond"]["rows"]),
+        "fiscal", len(merged["fiscal"]["rows"]),
+        "IMF", len(merged["imfDeficit"]["rows"]),
+        "updated", merged.get("updated"),
+        "preserved", ",".join(preserved) or "none",
+    )
+
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from json_merge_guard import add_force_argument
+    parser = argparse.ArgumentParser(description=__doc__)
+    add_force_argument(parser)
+    args = parser.parse_args()
+    main(force=args.force, output=args.output)
