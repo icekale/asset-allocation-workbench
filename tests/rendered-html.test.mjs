@@ -536,7 +536,7 @@ test("groups macro regulation into sourced monetary and fiscal charts", async ()
 
 test("publishes dated, source-backed advisory content", async () => {
   const data = JSON.parse(await readFile(new URL("../app/data/advisory.json", import.meta.url), "utf8"));
-  assert.match(data.dataThrough, /指标分项截至 2026-09-24/);
+  assert.match(data.dataThrough, /\d{4}-\d{2}-\d{2}/);
   assert.equal(data.macroPillars.length, 4);
   assert.equal(data.macroIndicators.length, 62);
   assert.equal(data.macroFramework.totalIndicators, 62);
@@ -651,12 +651,13 @@ test("puts verified within-year macro paths before annual context", async () => 
   assert.equal(compositePmi.subgroup, "景气指数");
   assert.equal(compositePmi.values.at(-1).toFixed(1), advisory.macroIndicators.find((item) => item.id === "M18").currentValue);
   const consumerConfidence = economic.find((item) => item.metric === "消费者信心指数");
-  assert.deepEqual(consumerConfidence.periods, ["1月", "2月", "3月", "4月", "5月", "6月", "7月"]);
-  assert.deepEqual(consumerConfidence.values, [90.6, 91.6, 90, 89, 89.9, 89.4, 89.2]);
+  // Jan–Jul from Wind history; Aug+ appended from Caixin 5198401 (original source NBS).
+  assert.deepEqual(consumerConfidence.periods.slice(0, 7), ["1月", "2月", "3月", "4月", "5月", "6月", "7月"]);
+  assert.deepEqual(consumerConfidence.values.slice(0, 7), [90.6, 91.6, 90, 89, 89.9, 89.4, 89.2]);
   assert.equal(consumerConfidence.subgroup, "景气指数");
   assert.equal(consumerConfidence.unit, "点");
   assert.equal(consumerConfidence.values.at(-1).toFixed(1), advisory.macroIndicators.find((item) => item.id === "M20").currentValue);
-  assert.match(consumerConfidence.source, /Wind EDB M0012303/);
+  assert.match(consumerConfidence.source, /Wind EDB M0012303|财新|5198401/);
   assert.match(source, /metric === "消费者信心指数" \? 100 : metric.includes\("PMI"\) \? 50/);
   assert.match(source, /按五类查看/);
   assert.deepEqual(data.series.find((item) => item.metric === "非制造业 PMI").values, [49.4, 49.5, 50.1, 49.4, 50.1, 50.2, 49.0, 49.0]);

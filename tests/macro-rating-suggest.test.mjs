@@ -132,3 +132,12 @@ test("periodic special-bond series joins MOF monthly issuance with sparse disbur
   const r = s.rows.find((x) => x.period === "2026-03");
   assert.deepEqual([r.newSpecialYtd, r.disbursedYtd, r.disbursedSwapYtd, r.disbursedToIssuedPct], [11599, 6723, 5904, 58]);
 });
+
+test("derived special-bond series carries proxy and combined-spend columns without estimates", () => {
+  const s = buildSpecialBondSeries({}, { q3: { url: "u", publisher: "财政部（2025年前三季度…）", statements: parseSpecialBondUseStatements("前三季度地方政府专项债券、超长期特别国债、中央金融机构注资特别国债等资金共支出4.21万亿元（含以往年度结转债券支出）。", { sourceUrl: "u", releaseDate: "2025-10-17", publisher: "财政部（2025年前三季度…）" }) } }, null,
+    { "2026-08": { url: "f", fundExpenditure: { amount: 51948, yoy: -17 } } });
+  assert.equal(s.rows.find((r) => r.period === "2025-09").combinedBondFundsSpentYtd, 42100);
+  assert.equal(s.rows.find((r) => r.period === "2026-08").govFundExpenditureYtd, 51948);
+  assert.match(s.basis, /非官方序列/);
+  assert.ok(s.rows.every((r) => r.disbursedYtd == null || Number.isFinite(r.disbursedYtd)));
+});

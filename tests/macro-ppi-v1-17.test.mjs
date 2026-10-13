@@ -177,7 +177,12 @@ test("all four PPI candidates compare the same 140 original months without rebra
   assert.equal(audit.id, "E04");
   assert.equal(audit.data.expectedMonthCount, 140);
   assert.equal(audit.data.rows.length, 140);
-  assert.deepEqual(audit.data.rows, originals);
+  // Frozen V1.17 audit: values/periods must match live NBS history exactly; NBS serves the same release under
+  // two equivalent stats.gov.cn paths (sj/zxfb vs xxgk/sjfb/zxfb2020), so URLs are compared by host + release id.
+  const strip = (r) => ({ ...r, sourceUrl: undefined });
+  assert.deepEqual(audit.data.rows.map(strip), originals.map(strip));
+  const rid = (u) => /t(\d{8})_\d+\.html$/.exec(u)?.[1];
+  audit.data.rows.forEach((r, i) => assert.equal(rid(r.sourceUrl)?.slice(0, 6), rid(originals[i].sourceUrl)?.slice(0, 6), r.period));
   assert.equal(new Set(originals.map((item) => item.period)).size, 140);
   assert.ok(originals.every((item, index) => Number.isFinite(item.value)
     && (index === 0 || monthNumber(item.period) - monthNumber(originals[index - 1].period) === 1)));

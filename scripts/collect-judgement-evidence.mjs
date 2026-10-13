@@ -273,7 +273,7 @@ for (const base of ["https://zwgls.mof.gov.cn/tjsj/", "https://yss.mof.gov.cn/zh
       const date = /<(?:meta[^>]+content|span)[^>]*>?\s*(\d{4})[-年](\d{1,2})[-月](\d{1,2})/.exec(html);
       const releaseDate = date ? `${date[1]}-${date[2].padStart(2,"0")}-${date[3].padStart(2,"0")}` : (item.releaseDate || null);
       got = { title: item.titleHint, url: m.url, originalUrl: item.originalUrl || null, releaseDate,
-        publisher: m.publisher, bank: item.bank, facts, sourceKind: m.kind, mirrorOf: item.originalUrl || null };
+        publisher: m.publisher, bank: item.bank, facts, sourceKind: m.kind, mirrorOf: item.originalUrl || null, originalStatus: item.originalStatus || null };
       break;
     }
     if (got) {
@@ -371,7 +371,10 @@ try {
 
 // ---- Policy banks (CDB needs a real browser for its JS check; Exim/ADBC plain) ----
 for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发银行"], ["http://www.eximbank.gov.cn/info/news/", "中国进出口银行"], ["https://www.adbc.com.cn/n5/n15/index.html", "中国农业发展银行"]]) {
-  const html = get(list) || browserGet(list);
+  const lastGood = key("lastgood_" + list);
+  let html = get(list) || browserGet(list, undefined, 8000);
+  if (html && html.length > 3000) fs.writeFileSync(lastGood, html);
+  else if (fs.existsSync(lastGood)) { html = fs.readFileSync(lastGood, "utf8"); log.push(`${bank} list unreachable; used last good copy (${new Date(fs.statSync(lastGood).mtimeMs).toISOString().slice(0, 10)})`); }
   if (!html) { log.push(`${bank} list unreachable`); continue; }
   const items = parseNewsList(html, list).filter((x) => /政策性金融工具|金融工具|资本金|注资/.test(x.title));
   for (const it of items.slice(0, 8)) {
@@ -455,7 +458,9 @@ ev.rrrNotices = ev.rrrNotices || {};
 }
 
 // Best-available periodic special-bond series (issuance monthly + sparse official disbursement points).
-ev.specialBondSeries = buildSpecialBondSeries(ev.localBonds, ev.specialBondUse, ev.annualTargets?.[String(new Date().getFullYear())]?.specialBondQuota ?? null);
+let fiscalProxy = {};
+try { fiscalProxy = JSON.parse(fs.readFileSync(path.join(root, "app/data/macro-rating-evidence.json"), "utf8")).fiscal || {}; } catch { /* proxy optional */ }
+ev.specialBondSeries = buildSpecialBondSeries(ev.localBonds, ev.specialBondUse, ev.annualTargets?.[String(new Date().getFullYear())]?.specialBondQuota ?? null, fiscalProxy);
 
 // Final cleanup: drop empty/titleOnly stubs; drop repost when an original for the same bank exists.
 {
