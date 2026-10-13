@@ -66,6 +66,15 @@ test("edit / keep / stale decisions", () => {
   assert.equal(row("P03A").source, "manual-carry");
 });
 
+test("older NIFD leverage PDFs use 提高至/降低至", () => {
+  const q3 = parseLeverageReport("302.3%。其中，居民部门杠杆率下降0.7个百分点，从二季度的61.1%降低至60.4%。非金融企业杠杆率上升0.4个百分点，从二季度的174.0%提高至174.4%；居民部门债务同比增长2.3%，企业部门债务同比增长6.9%", "2025年三季度宏观杠杆率报告");
+  assert.deepEqual([q3.period, q3.household.value, q3.corporate.value, q3.householdDebtGrowth, q3.corporateDebtGrowth], ["2025-Q3", 60.4, 174.4, 2.3, 6.9]);
+  const q2 = parseLeverageReport("居民部门杠杆率下降0.4个百分点，从一季度的61.5%降低至61.1%；非金融企业杠杆率上升0.3个百分点，从一季度的173.7%提高至174.0%；居民和企业部门债务同比分别增长3.0%和6.9%", "2025年二季度宏观杠杆率报告");
+  assert.equal(q2.corporateDebtGrowth, 6.9);
+  const q1 = parseLeverageReport("居民部门杠杆率上升0.1个百分点，从2024年末的61.4%提高至61.5%；非金融企业杠杆率上升5.3个百分点，从2024年末的168.4%提高至173.7%", "2025年一季度宏观杠杆率报告");
+  assert.deepEqual([q1.period, q1.household.value, q1.corporate.value], ["2025-Q1", 61.5, 173.7]);
+});
+
 test("judgement parsers", () => {
   assert.equal(parseRrrNotice("中国人民银行决定于2025年5月15日下调金融机构存款准备金率0.5个百分点（不含已执行5%存款准备金率的金融机构）。").signedChangeBp, -50);
   assert.equal(parseToolTable("单位：亿元 工具类型 准备金 调整法定存款准备金率 - - - 公开市场业务 x").injection, "-");

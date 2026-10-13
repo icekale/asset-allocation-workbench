@@ -6,11 +6,36 @@
       "titleHint": "国开新型政策性金融工具9月以来已投放超600亿元",
       "originalUrl": "https://www.cdb.com.cn/xwzx/khdt/202609/t20260924_13583.html",
       "mirrors": [
-        { "url": "https://www.xinhuanet.com/20260924/6bcee2548cf64f5d96f78d742322f16a/c.html", "publisher": "新华网（转述国家开发银行）", "kind": "repost" },
-        { "url": "https://www.news.cn/20260924/6bcee2548cf64f5d96f78d742322f16a/c.html", "publisher": "新华网news.cn（转述国家开发银行）", "kind": "repost" },
-        { "url": "http://finance.people.com.cn/n1/2026/0924/c1004-40805128.html", "publisher": "人民网（转载新华社，转述国家开发银行）", "kind": "repost" },
-        { "url": "https://www.stcn.com/article/detail/4197810.html", "publisher": "证券时报（转载新华社，转述国家开发银行）", "kind": "repost" },
-        { "url": "http://i1.ce.cn/finance/bank12/scroll/202610/t20261008_3248965.shtml", "publisher": "中国经济网转中国证券报（汇总转述三家政策性银行）", "kind": "repost" }
+        {
+          "url": "https://www.cdb.com.cn/xwzx/khdt/202609/t20260924_13583.html",
+          "publisher": "国家开发银行官网",
+          "kind": "original"
+        },
+        {
+          "url": "https://www.xinhuanet.com/20260924/6bcee2548cf64f5d96f78d742322f16a/c.html",
+          "publisher": "新华网（转述国家开发银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "https://www.news.cn/20260924/6bcee2548cf64f5d96f78d742322f16a/c.html",
+          "publisher": "新华网news.cn（转述国家开发银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "http://finance.people.com.cn/n1/2026/0924/c1004-40805128.html",
+          "publisher": "人民网（转载新华社，转述国家开发银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "https://www.stcn.com/article/detail/4197810.html",
+          "publisher": "证券时报（转载新华社，转述国家开发银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "http://i1.ce.cn/finance/bank12/scroll/202610/t20261008_3248965.shtml",
+          "publisher": "中国经济网转中国证券报（汇总转述三家政策性银行）",
+          "kind": "repost"
+        }
       ]
     },
     {
@@ -18,10 +43,26 @@
       "titleHint": "进银新型政策性金融工具9月以来投放超220亿元",
       "originalUrl": null,
       "mirrors": [
-        { "url": "https://www.news.cn/20260924/2e335fbb9af54a62ae15b612e5a4855c/c.html", "publisher": "新华网（转述中国进出口银行）", "kind": "repost" },
-        { "url": "https://www.xinhuanet.com/20260924/2e335fbb9af54a62ae15b612e5a4855c/c.html", "publisher": "新华网（转述中国进出口银行）", "kind": "repost" },
-        { "url": "https://www.nbd.com.cn/articles/2026-09-24/4591679.html", "publisher": "每经网（转载新华社，转述中国进出口银行）", "kind": "repost" },
-        { "url": "http://i1.ce.cn/finance/bank12/scroll/202610/t20261008_3248965.shtml", "publisher": "中国经济网转中国证券报（汇总转述三家政策性银行）", "kind": "repost" }
+        {
+          "url": "https://www.news.cn/20260924/2e335fbb9af54a62ae15b612e5a4855c/c.html",
+          "publisher": "新华网（转述中国进出口银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "https://www.xinhuanet.com/20260924/2e335fbb9af54a62ae15b612e5a4855c/c.html",
+          "publisher": "新华网（转述中国进出口银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "https://www.nbd.com.cn/articles/2026-09-24/4591679.html",
+          "publisher": "每经网（转载新华社，转述中国进出口银行）",
+          "kind": "repost"
+        },
+        {
+          "url": "http://i1.ce.cn/finance/bank12/scroll/202610/t20261008_3248965.shtml",
+          "publisher": "中国经济网转中国证券报（汇总转述三家政策性银行）",
+          "kind": "repost"
+        }
       ]
     },
     {
@@ -29,9 +70,21 @@
       "titleHint": "农发行共投放新型政策性金融工具项目124个",
       "originalUrl": "https://www.adbc.com.cn/n5/n17/c723421/content.html",
       "mirrors": [
-        { "url": "https://www.adbc.com.cn/n5/n17/c723421/content.html", "publisher": "中国农业发展银行官网", "kind": "original" },
-        { "url": "https://jrj.wuhan.gov.cn/ynzx_57/xwzx/202609/t20260928_2854437.shtml", "publisher": "武汉金融（转述农发行）", "kind": "repost" },
-        { "url": "http://i1.ce.cn/finance/bank12/scroll/202610/t20261008_3248965.shtml", "publisher": "中国经济网转中国证券报（汇总转述三家政策性银行）", "kind": "repost" }
+        {
+          "url": "https://www.adbc.com.cn/n5/n17/c723421/content.html",
+          "publisher": "中国农业发展银行官网",
+          "kind": "original"
+        },
+        {
+          "url": "https://jrj.wuhan.gov.cn/ynzx_57/xwzx/202609/t20260928_2854437.shtml",
+          "publisher": "武汉金融（转述农发行）",
+          "kind": "repost"
+        },
+        {
+          "url": "http://i1.ce.cn/finance/bank12/scroll/202610/t20261008_3248965.shtml",
+          "publisher": "中国经济网转中国证券报（汇总转述三家政策性银行）",
+          "kind": "repost"
+        }
       ]
     }
   ]

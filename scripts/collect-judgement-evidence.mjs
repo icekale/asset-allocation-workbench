@@ -13,13 +13,19 @@ const output = path.resolve(root, arg("output", "app/data/macro-rating-judgement
 const cacheDir = path.join(root, "output", "rating-evidence-cache");
 fs.mkdirSync(cacheDir, { recursive: true });
 const key = (url) => path.join(cacheDir, url.replace(/[^a-zA-Z0-9]+/g, "_").slice(-150));
+
+const UAS = [
+  "Mozilla/5.0 (compatible; aaw-rating-evidence/1.0)",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+];
 function get(url, { cache = false, min = 500 } = {}) {
   if (cache && fs.existsSync(key(url))) return fs.readFileSync(key(url), "utf8");
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      const body = execFileSync("curl", ["-fL", "--max-time", "40", "-sS", "-A", "Mozilla/5.0 (compatible; aaw-rating-evidence/1.0)", url], { maxBuffer: 64 << 20, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
+      if (attempt) execFileSync("sleep", [String(1 + attempt)]);
+      const body = execFileSync("curl", ["-fL", "--max-time", "40", "-sS", "-A", UAS[attempt % UAS.length], url], { maxBuffer: 64 << 20, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
       if (body.length > min) { if (cache) fs.writeFileSync(key(url), body); return body; }
-    } catch { /* retry */ }
+    } catch { /* retry with backoff / alternate UA */ }
   }
   return null;
 }
@@ -61,7 +67,7 @@ ev.sourcePolicy = "官方/国际组织原始发布；仅收集证据，不打分
 ev.cnbs = ev.cnbs || {};
 // NIFD list is dominated by weekly reports (5 items/page), so quarterly leverage reports sit ~30+ pages deep.
 // Known report ids are seeded so a shallow/blocked scan never empties CNBS evidence; prior rows are never deleted.
-const nifdSeed = [["4976", "2026年二季度宏观杠杆率报告"], ["4896", "2026年一季度宏观杠杆率报告"]];
+const nifdSeed = [["4976", "2026年二季度宏观杠杆率报告"], ["4896", "2026年一季度宏观杠杆率报告"], ["4788", "2025年三季度宏观杠杆率报告"], ["4728", "2025年二季度宏观杠杆率报告"], ["4648", "2025年一季度宏观杠杆率报告"]];
 for (let page = 0; page <= Number(arg("nifdPages", 45)); page += 1) {
   const html = page === 0 ? "" : get(`http://www.nifd.cn/SeriesReport/Index?id=2&pageIndex=${page}`);
   if (html === null) { log.push(`nifd list ${page} unreachable (box egress blocks nifd.cn; DMIT reachable)`); break; }
@@ -149,15 +155,23 @@ for (const [col, name] of [["https://www.miit.gov.cn/jgsj/ycls/wjfb/index.html",
 // ---- CSRC rule lists via the page's own searchList JSON (证监会令 / 证监会公告) ----
 for (const [channel, name] of [["cd11df89f5894c1eac37ae37cc11e369", "证监会令"], ["625a2f95cc104c1d8b646f98d9f87470", "证监会公告"]]) {
   let rows = 0;
+  const prior = Object.values(ev.policyDocs || {}).filter((d) => d.publisher === `中国证监会·${name}`).length;
   for (let p = 1; p <= 2; p += 1) {
-    const raw = get(`https://www.csrc.gov.cn/searchList/${channel}?_isAgg=true&_isJson=true&_pageSize=20&_template=index&_rangeTimeGte=&_channelName=&page=${p}`, { min: 100 });
-    let data = null; try { data = JSON.parse(raw || "null")?.data; } catch { /* below */ }
-    if (!data?.results) { log.push(`csrc ${name} json page ${p} failed`); break; }
+    let data = null;
+    for (let attempt = 0; attempt < 3 && !data?.results?.length; attempt += 1) {
+      if (attempt) execFileSync("sleep", [String(2 * attempt)]);
+      const raw = get(`https://www.csrc.gov.cn/searchList/${channel}?_isAgg=true&_isJson=true&_pageSize=20&_template=index&_rangeTimeGte=&_channelName=&page=${p}`, { min: 100 });
+      try { data = JSON.parse(raw || "null")?.data; } catch { data = null; }
+    }
+    if (!data?.results?.length) { log.push(`csrc ${name} json page ${p} failed (kept prior=${prior})`); break; }
     for (const r of data.results) {
-      const url = "https:" + r.url.replace(/^https?:/, "");
+      const url = "https:" + String(r.url || "").replace(/^https?:/, "");
+      if (!url.includes("csrc.gov.cn")) continue;
       const body = (r.content || r.memo || "").replace(/\s+/g, "");
+      const fwrq = (r.domainMetaList || []).flatMap((x) => x.resultList || []).find((x) => x.key === "fwrq")?.value;
+      const releaseDate = (r.publishedTimeStr || fwrq || (r.publishedTime ? new Date(r.publishedTime).toISOString() : "")).slice(0, 10);
       const themes = [...new Set([...classifyPolicy(r.title), ...classifyBody(body), "capitalMarketInstitution"])];
-      addDoc({ title: r.title, url, releaseDate: (r.publishedTimeStr || "").slice(0, 10), publisher: `中国证监会·${name}`, themes,
+      addDoc({ title: r.title, url, releaseDate, publisher: `中国证监会·${name}`, themes,
         matchedBy: "source+body", bodyChecked: true, attachments: (r.resList || []).filter((x) => x.type === "FILE").map((x) => ({ title: x.title, url: "https://www.csrc.gov.cn" + x.filePath })).slice(0, 5) });
       const doc = ev.policyDocs[url];
       if (doc && !doc.attachmentsChecked && body.length < 1500 && doc.attachments?.length) {
@@ -168,7 +182,7 @@ for (const [channel, name] of [["cd11df89f5894c1eac37ae37cc11e369", "证监会�
       rows += 1;
     }
   }
-  if (!rows) log.push(`csrc ${name} empty`);
+  if (!rows) log.push(`csrc ${name} empty this run (kept prior=${prior})`);
 }
 
 // ---- CSRC (reachable from DMIT): portal homepage (MM-DD dates) + rule/announcement lists ----
@@ -238,7 +252,14 @@ for (const base of ["https://zwgls.mof.gov.cn/tjsj/", "https://yss.mof.gov.cn/zh
   for (const item of cfg.items) {
     let got = null;
     for (const m of item.mirrors) {
-      const html = get(m.url, { cache: true }) || (m.kind === "original" ? browserGet(m.url) : null);
+      const via = item.bank === "国家开发银行" ? "https://www.cdb.com.cn/xwzx/khdt/" : (item.bank === "中国进出口银行" ? "http://www.eximbank.gov.cn/info/news/" : null);
+      let html = get(m.url, { cache: true });
+      // CDB/Exim: curl sometimes returns a shell without TRS body; prefer browser or UA-rotated re-fetch when amount missing.
+      if ((!html || (item.bank === "国家开发银行" && !/608\.5|TRS_Editor/.test(html))) && (m.kind === "original" || /cdb\.com\.cn|eximbank\.gov\.cn/.test(m.url))) {
+        html = browserGet(m.url, via) || get(m.url, { cache: false });
+      } else if (!html && m.kind === "original") {
+        html = browserGet(m.url);
+      }
       if (!html || html.length < 800) continue;
       const bankRe = item.bank === "国家开发银行" ? /国开|国家开发银行/ : item.bank === "中国进出口银行" ? /进银|进出口银行/ : /农发行|农业发展银行/;
       const facts = extractPolicyFinanceFacts(P.pageText(html).compact).filter((f) => !f.isQuotaRestate && bankRe.test(f.sentence));
@@ -343,7 +364,7 @@ try {
 } catch (e) { log.push(`annual targets: ${e.message}`); }
 
 // ---- Policy banks (CDB needs a real browser for its JS check; Exim/ADBC plain) ----
-for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发银行"], ["http://www.eximbank.gov.cn/", "中国进出口银行"], ["https://www.adbc.com.cn/n5/n15/index.html", "中国农业发展银行"]]) {
+for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发银行"], ["http://www.eximbank.gov.cn/info/news/", "中国进出口银行"], ["https://www.adbc.com.cn/n5/n15/index.html", "中国农业发展银行"]]) {
   const html = get(list) || browserGet(list);
   if (!html) { log.push(`${bank} list unreachable`); continue; }
   const items = parseNewsList(html, list).filter((x) => /政策性金融工具|金融工具|资本金|注资/.test(x.title));
