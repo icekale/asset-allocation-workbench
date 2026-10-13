@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { buildDraft, rulesHash } from "../lib/macro-rating-draft.mjs";
 import { buildSuggestions, JUDGEMENT_IDS } from "../lib/macro-rating-suggest.mjs";
-import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody, parseAnnualTargets, parseNewsList, attachmentLinks, parseSpecialBondUseStatements } from "../lib/macro-rating-judgement-parse.mjs";
+import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody, parseAnnualTargets, parseNewsList, attachmentLinks, parseSpecialBondUseStatements, buildSpecialBondSeries } from "../lib/macro-rating-judgement-parse.mjs";
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
@@ -110,4 +110,11 @@ test("special-bond use statements and cleaner policy-finance facts", () => {
   const eom = parseSpecialBondUseStatements("发挥地方政府专项债券带动作用，截至7月底全国已发行2026年新增专项债券2.4万亿元，支持建设项目超过1.8万个。", { sourceUrl: "https://mof.example/scio", releaseDate: "2026-08-21", publisher: "财政部" });
   assert.ok(eom.some((x) => x.kind === "issuance-asof" && x.asOfMonth === 7 && x.issuedYi === 24000 && x.projectsWan === 1.8));
   assert.ok(eom.some((x) => x.kind === "issuance" && x.issuedYi === 24000));
+});
+
+test("periodic special-bond series joins MOF monthly issuance with sparse disbursement points", () => {
+  const s = buildSpecialBondSeries({ "2026-03": { ytd: { newSpecial: 11599 }, month: { newSpecial: 4000 }, sourceUrl: "m" } },
+    { q1: { url: "q1", publisher: "财政部（2026年一季度…）", statements: [{ kind: "disbursement", disbursedYi: 6723, isSwap: false, releaseDate: "2026-04-24", sentence: "拨付专项债券资金6723亿元" }, { kind: "disbursement-swap", disbursedYi: 5904, isSwap: true, releaseDate: "2026-04-24", sentence: "一季度…拨付5904亿元" }] } }, 44000);
+  const r = s.rows.find((x) => x.period === "2026-03");
+  assert.deepEqual([r.newSpecialYtd, r.disbursedYtd, r.disbursedSwapYtd, r.disbursedToIssuedPct], [11599, 6723, 5904, 58]);
 });

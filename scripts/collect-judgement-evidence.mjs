@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import * as P from "../lib/rating-evidence-parse.mjs";
-import { classifyPolicy, classifyBody, parseLeverageReport, parseToolTable, parseToolRows, parseRrrNotice, parseLocalBondMonthly, extractPolicyFinanceFacts, parseAnnualTargets, parseNewsList, attachmentLinks, parseSpecialBondUseStatements } from "../lib/macro-rating-judgement-parse.mjs";
+import { classifyPolicy, classifyBody, parseLeverageReport, parseToolTable, parseToolRows, parseRrrNotice, parseLocalBondMonthly, extractPolicyFinanceFacts, parseAnnualTargets, parseNewsList, attachmentLinks, parseSpecialBondUseStatements, buildSpecialBondSeries } from "../lib/macro-rating-judgement-parse.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const arg = (n, d) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=")[1] ?? d;
@@ -59,10 +59,14 @@ ev.sourcePolicy = "官方/国际组织原始发布；仅收集证据，不打分
 
 // ---- CNBS (NIFD) quarterly macro leverage reports (nifd.cn reachable from DMIT) ----
 ev.cnbs = ev.cnbs || {};
-for (let page = 1; page <= Number(arg("nifdPages", 12)); page += 1) {
-  const html = get(`http://www.nifd.cn/SeriesReport/Index?id=2&pageIndex=${page}`);
-  if (!html) { log.push(`nifd list ${page} unreachable`); break; }
-  const items = [...html.matchAll(/href="\/SeriesReport\/Details\/(\d+)"[\s\S]*?<h4>([^<]*)<\/h4>/g)];
+// NIFD list is dominated by weekly reports (5 items/page), so quarterly leverage reports sit ~30+ pages deep.
+// Known report ids are seeded so a shallow/blocked scan never empties CNBS evidence; prior rows are never deleted.
+const nifdSeed = [["4976", "2026年二季度宏观杠杆率报告"], ["4896", "2026年一季度宏观杠杆率报告"]];
+for (let page = 0; page <= Number(arg("nifdPages", 45)); page += 1) {
+  const html = page === 0 ? "" : get(`http://www.nifd.cn/SeriesReport/Index?id=2&pageIndex=${page}`);
+  if (html === null) { log.push(`nifd list ${page} unreachable (box egress blocks nifd.cn; DMIT reachable)`); break; }
+  if (page > 0) execFileSync("sleep", ["0.5"]);
+  const items = page === 0 ? nifdSeed.map(([id, title]) => [null, id, title]) : [...html.matchAll(/href="\/SeriesReport\/Details\/(\d+)"[\s\S]*?<h4>([^<]*)<\/h4>/g)];
   for (const [, id, title] of items) {
     if (!/宏观杠杆率报告/.test(title)) continue;
     const url = `http://www.nifd.cn/SeriesReport/Details/${id}`;
@@ -80,7 +84,7 @@ for (let page = 1; page <= Number(arg("nifdPages", 12)); page += 1) {
       else log.push(`nifd parse failed ${url}`);
     } catch (e) { log.push(`nifd pdf ${pdfUrl}: ${e.message.split("\n")[0]}`); }
   }
-  if (Object.keys(ev.cnbs).length >= 6 && page >= 3) break;
+  if (Object.keys(ev.cnbs).length >= 4 && page >= 3) break;
 }
 
 // ---- BIS: China private non-financial DSR and credit-to-GDP gap (BIS publishes no CN household/NFC DSR split) ----
@@ -88,6 +92,9 @@ ev.bis = ev.bis || {};
 for (const [name, url] of Object.entries({
   dsrPrivate: "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_DSR/1.0/Q.CN.P?startPeriod=2023&format=csv",
   creditGap: "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CREDIT_GAP/1.0/Q.CN.P.A.C?startPeriod=2023&format=csv",
+  // Fallback cross-check for F09/F10 when CNBS is unreachable: BIS total credit % GDP (different basis from CNBS; reference only).
+  householdCreditGdp: "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_TC/2.0/Q.CN.H.A.M.770.A?startPeriod=2023&format=csv",
+  corporateCreditGdp: "https://stats.bis.org/api/v2/data/dataflow/BIS/WS_TC/2.0/Q.CN.N.A.M.770.A?startPeriod=2023&format=csv",
 })) {
   const csv = get(url, { min: 100 });
   if (!csv) { log.push(`bis ${name} unreachable`); continue; }
@@ -95,7 +102,7 @@ for (const [name, url] of Object.entries({
   const cols = head.split(",");
   const tp = cols.indexOf("TIME_PERIOD"), ov = cols.indexOf("OBS_VALUE");
   const rows = lines.map((l) => l.split(",")).filter((c) => c[ov] !== "").map((c) => ({ period: c[tp], value: Number(c[ov]) }));
-  ev.bis[name] = { sourceUrl: url, retrievedAt: ev.generatedAt.slice(0, 10), originalPublisher: "Bank for International Settlements", unit: name === "creditGap" ? "百分点" : "%", rows };
+  ev.bis[name] = { sourceUrl: url, retrievedAt: ev.generatedAt.slice(0, 10), originalPublisher: "Bank for International Settlements", unit: name === "creditGap" ? "百分点" : name.endsWith("CreditGdp") ? "%GDP（BIS口径，非CNBS）" : "%", rows };
 }
 
 // ---- Policy documents: State Council latest-policy feed + NDRC 两新 work updates; keyword classification ----
@@ -419,6 +426,9 @@ ev.rrrNotices = ev.rrrNotices || {};
   }
   ev.rrrNoticeScan = { listUrl: N + "index.html", scannedItems: scanned, oldestDate: oldest, at: ev.generatedAt.slice(0, 10) };
 }
+
+// Best-available periodic special-bond series (issuance monthly + sparse official disbursement points).
+ev.specialBondSeries = buildSpecialBondSeries(ev.localBonds, ev.specialBondUse, ev.annualTargets?.[String(new Date().getFullYear())]?.specialBondQuota ?? null);
 
 // Final cleanup: drop empty/titleOnly stubs when a full mirror/original exists for the same bank
 {
