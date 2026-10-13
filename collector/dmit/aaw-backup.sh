@@ -39,10 +39,19 @@ backup() {
   if [[ -d "$ROOT/app/data" ]]; then
     rsync -a --exclude='.dev.vars*' --exclude='.env*' "$ROOT/app/data/" "$WORKDIR/bundle/data/"
   fi
-  # Local Miniflare D1 sqlite
-  local d1="$ROOT/.wrangler/state/v3/d1/miniflare-D1DatabaseObject"
-  if [[ -d "$d1" ]]; then
+  # Local Miniflare D1 sqlite — prefer persist-to outside dist/ (AAW_WRANGLER_PERSIST)
+  local persist="${AAW_WRANGLER_PERSIST:-/var/lib/aaw/wrangler-state}"
+  local d1=""
+  if [[ -d "$persist/v3/d1/miniflare-D1DatabaseObject" ]]; then
+    d1="$persist/v3/d1/miniflare-D1DatabaseObject"
+  elif [[ -d "$ROOT/dist/server/.wrangler/state/v3/d1/miniflare-D1DatabaseObject" ]]; then
+    d1="$ROOT/dist/server/.wrangler/state/v3/d1/miniflare-D1DatabaseObject"
+  elif [[ -d "$ROOT/.wrangler/state/v3/d1/miniflare-D1DatabaseObject" ]]; then
+    d1="$ROOT/.wrangler/state/v3/d1/miniflare-D1DatabaseObject"
+  fi
+  if [[ -n "$d1" && -d "$d1" ]]; then
     rsync -a "$d1/" "$WORKDIR/bundle/d1/"
+    printf "d1Source=%s\n" "$d1" >>"$WORKDIR/bundle/meta/MANIFEST.txt"
   fi
   # Evidence / decision / alerts logs under output
   for f in stale-check.json source-health.json alerts.json collector-last-run.json; do

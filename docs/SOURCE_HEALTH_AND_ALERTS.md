@@ -17,3 +17,6 @@ node scripts/source-health.mjs
 - Telegram：Bot token + chat_id
 
 提供后另开任务接线；密钥仍不入库。
+
+## 组合数据日
+`portfolio.asOf`：读 `/api/health` 的 `asOf`。若落后超过 **3 个交易日**（或 `status=seed`），在 `/ops` 告警。重建门户不得清空 `/var/lib/aaw/wrangler-state`。
