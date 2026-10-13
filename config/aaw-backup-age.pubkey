@@ -1,3 +1,2 @@
-# Public age recipient for AAW backups. Private key lives only on DMIT at
-# /root/.config/aaw-backup/age.key (never commit). First run of aaw-backup.sh
-# overwrites this file with the live public key.
+# Public age recipient for AAW backups on DMIT. Private key: /root/.config/aaw-backup/age.key (never commit).
+age1uggkfqvhwsujhujrguldaylxk5mwfxg8h7qwdupvg0g84mvlzfdq99ngqr
