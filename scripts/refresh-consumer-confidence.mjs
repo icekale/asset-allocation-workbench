@@ -8,6 +8,8 @@ import {
   normalizeObservations,
   normalizePeriod,
   parseOfficialLevel,
+  appendToIntrayear,
+  spliceSeriesText,
 } from "../lib/consumer-confidence.mjs";
 import { caixinConfigFromValues, getCaixinObservations, getCaixinSeries, searchCaixinSeries, unwrapCaixinSearchSeries } from "../lib/caixin.ts";
 
@@ -250,22 +252,30 @@ const report = {
 await mkdir(dirname(reportPath), { recursive: true });
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 
-// Never overwrite a usable chart with a short or ambiguously sourced fragment.
-if (process.argv.includes("--apply") && summary.found >= 60) {
+// Append-only: keep every existing chart point; only add months newer than the last one shown.
+if (process.argv.includes("--apply") && records.length) {
   const app = JSON.parse(await readFile(appDataPath, "utf8"));
   const index = app.series.findIndex((row) => row.metric === "消费者信心指数");
   if (index < 0) throw new Error("宏观指标文件中找不到消费者信心指数");
   const target = app.series[index];
-  target.periods = records.map((row) => row.period);
-  target.values = records.map((row) => row.value);
-  target.sourceUrls = records.map((row) => row.sourceUrl ?? "");
-  target.observationSources = records.map(({ period, sourceId, source, unit, frequency, basis, sourceUrl }) => ({ period, sourceId, source: source ?? null, unit, frequency, basis, sourceUrl }));
-  target.basis = "国家统计局月度消费者信心指数水平；历史点按官方原始发布、Wind、财新优先级逐点核验；100为景气临界值";
-  target.source = "逐月来源、观测期、单位与口径见 observationSources；未核实月份保持缺口";
-  target.url = records.findLast((row) => row.sourceUrl)?.sourceUrl ?? target.url;
-  app.reviewedAt = new Date().toISOString().slice(0, 10);
-  await writeFile(appDataPath, `${JSON.stringify(app, null, 2)}\n`);
-  report.appliedToWorkbench = true;
+  const baselineYear = Number(target.baselineYear ?? String(target.source ?? "").match(/(20\d{2})年/)?.[1]);
+  if (!baselineYear) throw new Error("消费者信心指数缺少基准年份，拒绝写入");
+  const { target: next, appended, conflicts } = appendToIntrayear(target, records, baselineYear);
+  report.appended = appended.map(({ period, value, sourceId }) => ({ period, value, sourceId }));
+  report.conflicts = conflicts;
+  if (appended.length) {
+    const last = appended.at(-1);
+    const [ly, lm] = last.period.split("-");
+    const vendors = [...new Set(next.observationSources.map((row) => row.sourceId))].join("、");
+    next.baselineYear = baselineYear;
+    next.basis = "国家统计局月度消费者信心指数，100为景气临界值；新增月份逐点核验后追加，历史点不改写";
+    next.source = `${baselineYear}年1—7月 Wind EDB M0012303；新增月份 ${vendors}（原始来源：国家统计局；截至${ly}年${Number(lm)}月）`;
+    let text = spliceSeriesText(await readFile(appDataPath, "utf8"), "消费者信心指数", next);
+    text = text.replace(/"reviewedAt": "\d{4}-\d{2}-\d{2}"/, `"reviewedAt": "${new Date().toISOString().slice(0, 10)}"`);
+    JSON.parse(text);
+    await writeFile(appDataPath, text);
+    report.appliedToWorkbench = true;
+  }
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
 }
 

@@ -152,6 +152,12 @@ for (const [channel, name] of [["cd11df89f5894c1eac37ae37cc11e369", "证监会�
       const themes = [...new Set([...classifyPolicy(r.title), ...classifyBody(body), "capitalMarketInstitution"])];
       addDoc({ title: r.title, url, releaseDate: (r.publishedTimeStr || "").slice(0, 10), publisher: `中国证监会·${name}`, themes,
         matchedBy: "source+body", bodyChecked: true, attachments: (r.resList || []).filter((x) => x.type === "FILE").map((x) => ({ title: x.title, url: "https://www.csrc.gov.cn" + x.filePath })).slice(0, 5) });
+      const doc = ev.policyDocs[url];
+      if (doc && !doc.attachmentsChecked && body.length < 1500 && doc.attachments?.length) {
+        const text = attachmentText(doc.attachments[0].url);
+        doc.attachmentsChecked = true;
+        if (text) { doc.attachmentTextChars = text.length; doc.themes = [...new Set([...doc.themes, ...classifyBody(text)])]; }
+      }
       rows += 1;
     }
   }
@@ -177,12 +183,13 @@ for (const url of ["https://www.csrc.gov.cn/csrc/c106256/common_list.shtml"]) {
 {
   const from = new Date(Date.now() - 120 * 864e5).toISOString().slice(0, 10);
   let fetched = 0;
-  for (const d of Object.values(ev.policyDocs).filter((x) => x.releaseDate >= from && !x.bodyChecked).sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))) {
+  for (const d of Object.values(ev.policyDocs).filter((x) => x.releaseDate >= from && (!x.bodyChecked || !x.attachmentsChecked && !/csrc/.test(x.url))).sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))) {
     if (fetched >= Number(arg("bodyLimit", 80))) break;
     const html = get(d.url, { cache: true });
     fetched += 1;
     d.bodyChecked = true;
     if (!html) continue;
+    d.attachmentsChecked = true;
     let body = P.pageText(html).compact;
     const atts = attachmentLinks(html, d.url);
     if (atts.length && (body.length < 1500 || !d.themes.length)) {
@@ -231,7 +238,7 @@ try {
 } catch (e) { log.push(`annual targets: ${e.message}`); }
 
 // ---- Policy banks (CDB needs a real browser for its JS check; Exim/ADBC plain) ----
-for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发银行"], ["https://www.eximbank.gov.cn/", "中国进出口银行"], ["https://www.adbc.com.cn/n5/n15/index.html", "中国农业发展银行"]]) {
+for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发银行"], ["http://www.eximbank.gov.cn/", "中国进出口银行"], ["https://www.adbc.com.cn/n5/n15/index.html", "中国农业发展银行"]]) {
   const html = get(list) || browserGet(list);
   if (!html) { log.push(`${bank} list unreachable`); continue; }
   const items = parseNewsList(html, list).filter((x) => /政策性金融工具|金融工具|资本金|注资/.test(x.title));

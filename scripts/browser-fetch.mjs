@@ -13,10 +13,10 @@ const [url, wait = "2500"] = process.argv.slice(2);
 const browser = await chromium.launch({ args: ["--no-sandbox"] });
 try {
   const page = await browser.newPage({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36", locale: "zh-CN" });
-  const res = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+  let res = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
   await page.waitForTimeout(Number(wait));
   // Some WAFs answer the first hit with a JS check (HTTP 412) and set a cookie; a normal browser reloads once.
-  if ([412, 202].includes(res?.status() ?? 0)) { await page.reload({ waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => null); await page.waitForTimeout(Number(wait)); }
+  if ([412, 202].includes(res?.status() ?? 0)) { res = (await page.reload({ waitUntil: "domcontentloaded", timeout: 45000 }).catch(() => null)) ?? res; await page.waitForTimeout(Number(wait)); }
   const html = await page.content();
   if (/验证码|captcha|滑动验证/i.test(html) && html.length < 20000) { console.error("challenge page (not bypassed)"); process.exit(4); }
   process.stdout.write(`<!-- status:${res?.status() ?? 0} final:${page.url()} -->\n` + html);

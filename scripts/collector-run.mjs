@@ -206,6 +206,22 @@ if (skipCollectors) {
     detail: result.ok ? "apply via refresh-official-macro (backup/rollback)" : result.output.trim().slice(0, 500),
     output: result.output.trim().slice(0, 4_000),
   });
+  // 消费者信心指数: NBS no longer publishes the level in releases or its new database; official → Caixin, append-only.
+  const t1 = Date.now();
+  const cci = await run(
+    process.execPath,
+    ["--experimental-strip-types", "scripts/refresh-consumer-confidence.mjs", "--apply"],
+    { timeoutMs: COLLECTOR_TIMEOUT_MS, env: { ...process.env, CCI_SKIP_WIND: "1" } },
+  );
+  await recordStep({
+    id: "consumer-confidence",
+    ok: cci.ok,
+    skipped: false,
+    durationMs: Date.now() - t1,
+    code: cci.code,
+    detail: cci.ok ? "append-only (官方→财新)" : cci.output.trim().slice(0, 500),
+    output: cci.output.trim().slice(0, 2_000),
+  });
 } else {
   // audit: stageable collectors only → staging/
   await recordStep({
