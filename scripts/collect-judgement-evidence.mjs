@@ -32,14 +32,20 @@ function get(url, { cache = false, min = 500 } = {}) {
 
 // Headless browser fallback for JS-gated public pages (DMIT: /opt/aaw-browser). Low rate; no captcha/login handling.
 let browserCalls = 0;
-function browserGet(url, via) {
+function browserGet(url, via, waitMs = 3500) {
   const file = key("browser_" + url);
-  if (fs.existsSync(file) && Date.now() - fs.statSync(file).mtimeMs < 20 * 3600e3) return fs.readFileSync(file, "utf8");
+  if (fs.existsSync(file) && Date.now() - fs.statSync(file).mtimeMs < 20 * 3600e3) {
+    const cached = fs.readFileSync(file, "utf8");
+    // Discard stale challenge shells (412/empty body) so a later run can retry.
+    if (/<!-- status:(200|304)/.test(cached.slice(0, 200)) && cached.length > 3000 && !/验证码|captcha/i.test(cached.slice(0, 5000))) return cached;
+  }
   if (browserCalls >= Number(arg("browserLimit", 25))) return null;
   browserCalls += 1;
   try {
     execFileSync("sleep", ["2"]);
-    const html = execFileSync(process.execPath, [path.join(root, "scripts/browser-fetch.mjs"), url, "3500", ...(via ? [`--via=${via}`] : [])], { maxBuffer: 64 << 20, timeout: 120000, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
+    // CDB/Exim WAF needs a longer settle after the list-page cookie hop.
+    const wait = String(/cdb\.com\.cn|eximbank\.gov\.cn/.test(url) ? Math.max(waitMs, 8000) : waitMs);
+    const html = execFileSync(process.execPath, [path.join(root, "scripts/browser-fetch.mjs"), url, wait, ...(via ? [`--via=${via}`] : [])], { maxBuffer: 64 << 20, timeout: 180000, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
     if (/<!-- status:(200|304)/.test(html.slice(0, 200)) && html.length > 3000) { fs.writeFileSync(file, html); return html; }
   } catch { /* unavailable or blocked */ }
   return null;
