@@ -246,9 +246,10 @@ for (const base of ["https://zwgls.mof.gov.cn/tjsj/", "https://yss.mof.gov.cn/zh
       const key = got.url;
       const prior = ev.policyFinance[key];
       if (!prior?.facts?.length || prior.titleOnly) ev.policyFinance[key] = got;
-      // Drop superseded title-only CDB entry for the same story.
       for (const [k, d] of Object.entries(ev.policyFinance)) {
-        if (d.titleOnly && d.publisher === item.bank && /政策性金融工具/.test(d.title || "")) delete ev.policyFinance[k];
+        if ((d.titleOnly || !d.facts?.length) && (d.bank === item.bank || d.publisher === item.bank) && /政策性金融工具|注资/.test(d.title || "")) {
+          if (d.titleOnly || (got.facts?.length && !d.facts?.length && /金融工具/.test(d.title || ""))) delete ev.policyFinance[k];
+        }
       }
     } else log.push(`policy-finance mirror miss ${item.bank}`);
   }
@@ -277,10 +278,12 @@ ev.specialBondUse = ev.specialBondUse || {};
   try {
     const out = execFileSync(process.execPath, ["--experimental-strip-types", path.join(root, "scripts/caixin-fetch.mjs"), "search", "地方政府专项债券"], { cwd: root, maxBuffer: 4 << 20, timeout: 60000, env: process.env }).toString("utf8");
     const j = JSON.parse(out);
-    const national = (j.series || []).filter((s) => !/：|:/.test(s.name.split(":")[0] || "") || /全国|中国:/.test(s.name));
-    ev.specialBondUse.caixinNote = { searched: "地方政府专项债券", hits: (j.series || []).length, nationalHits: national.length,
-      sample: (j.series || []).slice(0, 3).map((s) => ({ id: s.series_id, name: s.name, source: s.source, frequency: s.frequency })),
-      conclusion: national.length ? "found candidate national series" : "Caixin hits are local city fund lines, not a national special-bond use series" };
+    const rows = j.series || [];
+    const national = rows.filter((s) => /^(全国|中国)[:：]/.test(s.name) || (!/[:：]/.test(s.name) && /全国/.test(s.name)));
+    const localOnly = rows.length > 0 && national.length === 0;
+    ev.specialBondUse.caixinNote = { searched: "地方政府专项债券", hits: rows.length, nationalHits: national.length,
+      sample: rows.slice(0, 3).map((s) => ({ id: s.series_id, name: s.name, source: s.source, frequency: s.frequency })),
+      conclusion: localOnly ? "Caixin hits are local city fund income/expenditure lines, not a national special-bond use series" : (national.length ? "found candidate national series" : "no Caixin hits") };
   } catch (e) { log.push(`caixin special-bond search: ${e.message.split("\n")[0]}`); }
 }
 
