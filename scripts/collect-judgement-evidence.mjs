@@ -287,6 +287,14 @@ ev.specialBondUse = ev.specialBondUse || {};
   } catch (e) { log.push(`caixin special-bond search: ${e.message.split("\n")[0]}`); }
 }
 
+// titleOnly cleanup pass: drop list-title stubs when a full mirror/original exists for the same bank
+{
+  const banksWithFull = new Set(Object.values(ev.policyFinance).filter((d) => d.facts?.length && (d.sourceKind === "repost" || d.sourceKind === "original")).map((d) => d.bank).filter(Boolean));
+  for (const [k, d] of Object.entries(ev.policyFinance)) {
+    if (d.titleOnly && banksWithFull.has(d.bank || d.publisher)) delete ev.policyFinance[k];
+  }
+}
+
 // ---- Annual targets (quota denominators) from the Government Work Report full text ----
 ev.annualTargets = ev.annualTargets || {};
 try {
