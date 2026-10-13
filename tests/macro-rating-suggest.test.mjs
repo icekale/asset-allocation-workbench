@@ -104,6 +104,11 @@ test("annual targets, news lists and attachment links", () => {
   assert.deepEqual(attachmentLinks('<a href="/files/a.PDF">x</a><a href="b.wps">', "https://x.gov.cn/p/"), ["https://x.gov.cn/files/a.PDF", "https://x.gov.cn/p/b.wps"]);
 });
 
+test("CDB TRS body and glued-chrome deployment clauses", () => {
+  const glued = "开行新闻_国开新型政策性金融工具9月以来已投放超600亿元员工邮箱|设为首页国家开发银行坚决贯彻落实，9月以来国开新型政策性金融工具已投放资金608.5亿元，支持项目153个，涉及项目总投资1.4万亿元。";
+  assert.ok(extractPolicyFinanceFacts(glued).some((x) => x.amounts[0] === 608.5));
+});
+
 test("special-bond use statements and cleaner policy-finance facts", () => {
   const f = extractPolicyFinanceFacts("分享到：无关。记者9月24日从国家开发银行获悉，9月以来，国开新型政策性金融工具已投放资金608.5亿元，支持项目153个，涉及项目总投资1.4万亿元。今年的政府工作报告明确，2026年发行新型政策性金融工具8000亿元，带动更多社会资本参与投资。");
   assert.equal(f[0].amounts[0], 608.5);
