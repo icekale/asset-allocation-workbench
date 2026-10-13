@@ -457,16 +457,19 @@ ev.rrrNotices = ev.rrrNotices || {};
 // Best-available periodic special-bond series (issuance monthly + sparse official disbursement points).
 ev.specialBondSeries = buildSpecialBondSeries(ev.localBonds, ev.specialBondUse, ev.annualTargets?.[String(new Date().getFullYear())]?.specialBondQuota ?? null);
 
-// Final cleanup: drop empty/titleOnly stubs when a full mirror/original exists for the same bank
+// Final cleanup: drop empty/titleOnly stubs; drop repost when an original for the same bank exists.
 {
-  const banksWithFull = new Set(Object.values(ev.policyFinance || {}).filter((d) => d.facts?.length && (d.sourceKind === "repost" || d.sourceKind === "original")).map((d) => d.bank).filter(Boolean));
+  const bankOf = (d) => d.bank || (/国家开发银行|中国进出口银行|中国农业发展银行/.exec(d.publisher || "")?.[0]);
+  const banksWithOriginal = new Set(Object.values(ev.policyFinance || {}).filter((d) => d.facts?.length && d.sourceKind === "original").map(bankOf).filter(Boolean));
+  const banksWithFull = new Set(Object.values(ev.policyFinance || {}).filter((d) => d.facts?.length && (d.sourceKind === "repost" || d.sourceKind === "original")).map(bankOf).filter(Boolean));
   for (const [k, d] of Object.entries(ev.policyFinance || {})) {
-    const bank = d.bank || (/国家开发银行|中国进出口银行|中国农业发展银行/.exec(d.publisher || "")?.[0]);
+    const bank = bankOf(d);
+    if (banksWithOriginal.has(bank) && d.sourceKind === "repost") { delete ev.policyFinance[k]; continue; }
     if (banksWithFull.has(bank) && (d.titleOnly || !d.facts?.length) && d.sourceKind !== "repost" && d.sourceKind !== "original") delete ev.policyFinance[k];
   }
 }
 
-ev.log = log;
+
 fs.writeFileSync(output + ".tmp", JSON.stringify(ev, null, 1) + "\n");
 fs.renameSync(output + ".tmp", output);
 console.log(JSON.stringify({ cnbs: Object.keys(ev.cnbs).sort().at(-1) ?? null, bis: Object.fromEntries(Object.entries(ev.bis).map(([k, v]) => [k, v.rows.at(-1)])),
