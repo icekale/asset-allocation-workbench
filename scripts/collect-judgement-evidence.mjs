@@ -244,8 +244,8 @@ for (const base of ["https://zwgls.mof.gov.cn/tjsj/", "https://yss.mof.gov.cn/zh
     }
     if (got) {
       const key = got.url;
-      const prior = ev.policyFinance[key];
-      if (!prior?.facts?.length || prior.titleOnly) ev.policyFinance[key] = got;
+      // Always refresh configured mirror facts (parser/source improvements).
+      ev.policyFinance[key] = got;
       for (const [k, d] of Object.entries(ev.policyFinance)) {
         if ((d.titleOnly || !d.facts?.length) && (d.bank === item.bank || d.publisher === item.bank) && /政策性金融工具|注资/.test(d.title || "")) {
           if (d.titleOnly || (got.facts?.length && !d.facts?.length && /金融工具/.test(d.title || ""))) delete ev.policyFinance[k];
@@ -268,12 +268,13 @@ ev.specialBondUse = ev.specialBondUse || {};
     }
   } else log.push("mof news list unreachable");
   for (const src of [...cfg.items, ...extra.slice(0, 8)]) {
-    if (ev.specialBondUse[src.url]?.statements?.length) continue;
+    // Always re-parse configured/list sources so disbursement / as-of patterns stay current.
     const html = get(src.url, { cache: true }) || browserGet(src.url);
     if (!html) { log.push(`special-bond-use unreachable ${src.url}`); continue; }
     const statements = parseSpecialBondUseStatements(P.pageText(html).compact, src);
     if (statements.length) ev.specialBondUse[src.url] = { ...src, statements };
   }
+  if (cfg.ndrcNote) ev.specialBondUse.ndrcNote = cfg.ndrcNote;
   // Caixin: search for a national use series; local city series are not substitutes.
   try {
     const out = execFileSync(process.execPath, ["--experimental-strip-types", path.join(root, "scripts/caixin-fetch.mjs"), "search", "地方政府专项债券"], { cwd: root, maxBuffer: 4 << 20, timeout: 60000, env: process.env }).toString("utf8");

@@ -107,4 +107,7 @@ test("special-bond use statements and cleaner policy-finance facts", () => {
   assert.ok(d.some((x) => x.kind === "disbursement-swap" && x.disbursedYi === 5904));
   assert.ok(d.some((x) => x.kind === "issuance" && x.issuedYi === 11599));
   assert.ok(d.some((x) => x.kind === "issuance-asof-date" && x.asOfMonth === 9 && x.asOfDay === 20 && x.issuedYi === 31000 && x.progressPct === 70));
+  const eom = parseSpecialBondUseStatements("发挥地方政府专项债券带动作用，截至7月底全国已发行2026年新增专项债券2.4万亿元，支持建设项目超过1.8万个。", { sourceUrl: "https://mof.example/scio", releaseDate: "2026-08-21", publisher: "财政部" });
+  assert.ok(eom.some((x) => x.kind === "issuance-asof" && x.asOfMonth === 7 && x.issuedYi === 24000 && x.projectsWan === 1.8));
+  assert.ok(eom.some((x) => x.kind === "issuance" && x.issuedYi === 24000));
 });

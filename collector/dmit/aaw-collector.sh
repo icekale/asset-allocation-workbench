@@ -74,6 +74,14 @@ prune_logs() {
       elif [ -z "${before:-}" ] && [ -n "${after:-}" ]; then
         changed=1
       fi
+      # Semi-automatic macro rating: draft only (frozen rules), never publishes.
+      echo "=== macro rating draft ==="
+      timeout 1800 "$NODE" scripts/collect-rating-evidence.mjs || echo "=== rating evidence collection FAILED (draft uses previous evidence) ==="
+      timeout 2400 "$NODE" scripts/collect-judgement-evidence.mjs --browserLimit=15 --attachLimit=20 || echo "=== judgement evidence collection FAILED (suggestions use previous evidence) ==="
+      "$NODE" scripts/macro-rating-draft.mjs build || echo "=== macro rating draft FAILED ==="
+      if [ -f "$AAW/output/macro-rating-draft-notable.json" ]; then
+        echo "=== NOTABLE macro rating change: $(cat "$AAW/output/macro-rating-draft-notable.json" | tr -d "\n") ==="
+      fi
       echo "=== apply finished exit=$code data_changed=$changed before_mtime=${before:-none} after_mtime=${after:-none} ==="
       # Restart when apply succeeded, or when app/data mtimes moved (partial write).
       if [ "$code" -eq 0 ] || [ "$changed" -eq 1 ]; then
