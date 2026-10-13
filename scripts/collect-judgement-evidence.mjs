@@ -26,14 +26,14 @@ function get(url, { cache = false, min = 500 } = {}) {
 
 // Headless browser fallback for JS-gated public pages (DMIT: /opt/aaw-browser). Low rate; no captcha/login handling.
 let browserCalls = 0;
-function browserGet(url) {
+function browserGet(url, via) {
   const file = key("browser_" + url);
   if (fs.existsSync(file) && Date.now() - fs.statSync(file).mtimeMs < 20 * 3600e3) return fs.readFileSync(file, "utf8");
   if (browserCalls >= Number(arg("browserLimit", 25))) return null;
   browserCalls += 1;
   try {
     execFileSync("sleep", ["2"]);
-    const html = execFileSync(process.execPath, [path.join(root, "scripts/browser-fetch.mjs"), url, "3500"], { maxBuffer: 64 << 20, timeout: 120000, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
+    const html = execFileSync(process.execPath, [path.join(root, "scripts/browser-fetch.mjs"), url, "3500", ...(via ? [`--via=${via}`] : [])], { maxBuffer: 64 << 20, timeout: 120000, stdio: ["ignore", "pipe", "ignore"] }).toString("utf8");
     if (/<!-- status:(200|304)/.test(html.slice(0, 200)) && html.length > 3000) { fs.writeFileSync(file, html); return html; }
   } catch { /* unavailable or blocked */ }
   return null;
@@ -244,8 +244,13 @@ for (const [list, bank] of [["https://www.cdb.com.cn/xwzx/khdt/", "国家开发�
   const items = parseNewsList(html, list).filter((x) => /政策性金融工具|金融工具|资本金|注资/.test(x.title));
   for (const it of items.slice(0, 8)) {
     if (ev.policyFinance[it.url]?.facts?.length) continue;
-    const page = fetchAny(it.url);
-    if (!page) { log.push(`${bank} article unreachable ${it.url}`); continue; }
+    const page = get(it.url, { cache: true }) || browserGet(it.url, list);
+    if (!page) {
+      const facts = extractPolicyFinanceFacts(it.title);
+      log.push(`${bank} article blocked (list title kept) ${it.url}`);
+      if (facts.length) ev.policyFinance[it.url] = { title: it.title, url: it.url, releaseDate: it.date, publisher: bank, facts, titleOnly: true };
+      continue;
+    }
     const text = P.pageText(page).compact;
     const facts = extractPolicyFinanceFacts(text);
     const date = it.date || /(20\d\d)[-年](\d{2})[-月](\d{2})/.exec(text)?.slice(1).join("-") || null;
