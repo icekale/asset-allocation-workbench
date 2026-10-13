@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { buildDraft, rulesHash } from "../lib/macro-rating-draft.mjs";
 import { buildSuggestions, JUDGEMENT_IDS } from "../lib/macro-rating-suggest.mjs";
-import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody, parseAnnualTargets, parseNewsList, attachmentLinks } from "../lib/macro-rating-judgement-parse.mjs";
+import { parseRrrNotice, parseToolTable, parseLeverageReport, classifyPolicy, parseLocalBondMonthly, parseToolRows, extractPolicyFinanceFacts, classifyBody, parseAnnualTargets, parseNewsList, attachmentLinks, parseSpecialBondUseStatements } from "../lib/macro-rating-judgement-parse.mjs";
 
 const read = (f) => JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), "utf8"));
 const framework = read("app/data/macro-rating-v1.json"), current = read("app/data/macro-rating-current.json");
@@ -81,8 +81,9 @@ test("special-bond, structural-tool and policy-finance parsers", () => {
   const old = parseLocalBondMonthly("2025年11月，全国发行新增地方政府债券5338亿元，其中一般债券416亿元、专项债券4922亿元。全国发行再融资债券3789亿元，其中一般债券2346亿元、专项债券1443亿元。合计，全国发行地方政府债券9127亿元，其中一般债券2762亿元、专项债券6365亿元。");
   assert.equal(old.month.specialTotal, 6365);
   assert.equal(parseToolRows("抵押补充贷款（PSL） 0 14 -14 其他结构性货币政策工具 6016 6580 -564").psl.netInjection, -14);
-  const f = extractPolicyFinanceFacts("首页|登录|8000亿元新型政策性金融工具资金加快投放|国开新型政策性金融工具已投放资金608.5亿元，支持项目153个。无关句子。");
-  assert.deepEqual(f.map((x) => x.amounts), [[8000], [608.5]]);
+  const f = extractPolicyFinanceFacts("无关导航。记者获悉，国开新型政策性金融工具已投放资金608.5亿元，支持项目153个。今年的政府工作报告明确，2026年发行新型政策性金融工具8000亿元，带动更多社会资本参与投资。");
+  assert.deepEqual(f.filter((x) => !x.isQuotaRestate).map((x) => x.amounts), [[608.5]]);
+  assert.equal(f.find((x) => x.isQuotaRestate)?.amounts[0], 8000);
   assert.deepEqual(classifyBody("上市公司分红…上市公司回购…资本市场"), ["capitalMarketInstitution"]);
 });
 
@@ -92,4 +93,13 @@ test("annual targets, news lists and attachment links", () => {
   const l = parseNewsList('<a href="./202609/t20260924_13583.html">国开新型政策性金融工具9月以来已投放超600亿元</a><a href="./info/news/202609/t20260906_77538.html"><h4>财政部将向中国进出口银行注资</h4><h5>2026-09-06</h5></a>', "https://www.cdb.com.cn/xwzx/khdt/");
   assert.deepEqual(l.map((x) => [x.date, x.title]), [["2026-09-24", "国开新型政策性金融工具9月以来已投放超600亿元"], ["2026-09-06", "财政部将向中国进出口银行注资"]]);
   assert.deepEqual(attachmentLinks('<a href="/files/a.PDF">x</a><a href="b.wps">', "https://x.gov.cn/p/"), ["https://x.gov.cn/files/a.PDF", "https://x.gov.cn/p/b.wps"]);
+});
+
+test("special-bond use statements and cleaner policy-finance facts", () => {
+  const f = extractPolicyFinanceFacts("分享到：无关。记者9月24日从国家开发银行获悉，9月以来，国开新型政策性金融工具已投放资金608.5亿元，支持项目153个，涉及项目总投资1.4万亿元。今年的政府工作报告明确，2026年发行新型政策性金融工具8000亿元，带动更多社会资本参与投资。");
+  assert.equal(f[0].amounts[0], 608.5);
+  assert.equal(f.find((x) => x.isQuotaRestate)?.amounts[0], 8000);
+  const u = parseSpecialBondUseStatements("上半年各地累计发行新增专项债券2.07万亿元，发行进度47%，支持建设项目超1.7万个，其中用于项目资本金超1700亿元。截至7月末，发行新增专项债券2.41万亿元，支持建设项目超1.8万个。指导督促各地加快资金拨付使用进度，尽快形成实物工作量。", { sourceUrl: "https://mof.example/a", releaseDate: "2026-07-22", publisher: "财政部" });
+  assert.ok(u.some((x) => x.kind === "issuance" && x.issuedYi === 20700 && x.progressPct === 47 && x.capitalYi === 1700));
+  assert.ok(u.some((x) => x.kind === "issuance-asof" && x.asOfMonth === 7 && x.issuedYi === 24100));
 });

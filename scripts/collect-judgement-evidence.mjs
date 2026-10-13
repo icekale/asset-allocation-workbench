@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import * as P from "../lib/rating-evidence-parse.mjs";
-import { classifyPolicy, classifyBody, parseLeverageReport, parseToolTable, parseToolRows, parseRrrNotice, parseLocalBondMonthly, extractPolicyFinanceFacts, parseAnnualTargets, parseNewsList, attachmentLinks } from "../lib/macro-rating-judgement-parse.mjs";
+import { classifyPolicy, classifyBody, parseLeverageReport, parseToolTable, parseToolRows, parseRrrNotice, parseLocalBondMonthly, extractPolicyFinanceFacts, parseAnnualTargets, parseNewsList, attachmentLinks, parseSpecialBondUseStatements } from "../lib/macro-rating-judgement-parse.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const arg = (n, d) => process.argv.find((a) => a.startsWith(`--${n}=`))?.split("=")[1] ?? d;
@@ -224,6 +224,66 @@ for (const base of ["https://zwgls.mof.gov.cn/tjsj/", "https://yss.mof.gov.cn/zh
   }
 }
 
+
+// ---- Policy-finance tool amounts via official mirrors (Xinhua / bank pages) when original CDB articles are blocked ----
+{
+  const cfg = JSON.parse(fs.readFileSync(path.join(root, "config/policy-finance-mirrors.json"), "utf8"));
+  for (const item of cfg.items) {
+    let got = null;
+    for (const m of item.mirrors) {
+      const html = get(m.url, { cache: true }) || (m.kind === "original" ? browserGet(m.url) : null);
+      if (!html || html.length < 800) continue;
+      const bankRe = item.bank === "国家开发银行" ? /国开|国家开发银行/ : item.bank === "中国进出口银行" ? /进银|进出口银行/ : /农发行|农业发展银行/;
+      const facts = extractPolicyFinanceFacts(P.pageText(html).compact).filter((f) => !f.isQuotaRestate && bankRe.test(f.sentence));
+      if (!facts.length) continue;
+      const date = /<(?:meta[^>]+content|span)[^>]*>?\s*(\d{4})[-年](\d{1,2})[-月](\d{1,2})/.exec(html);
+      const releaseDate = date ? `${date[1]}-${date[2].padStart(2,"0")}-${date[3].padStart(2,"0")}` : (item.releaseDate || null);
+      got = { title: item.titleHint, url: m.url, originalUrl: item.originalUrl || null, releaseDate,
+        publisher: m.publisher, bank: item.bank, facts, sourceKind: m.kind, mirrorOf: item.originalUrl || null };
+      break;
+    }
+    if (got) {
+      const key = got.url;
+      const prior = ev.policyFinance[key];
+      if (!prior?.facts?.length || prior.titleOnly) ev.policyFinance[key] = got;
+      // Drop superseded title-only CDB entry for the same story.
+      for (const [k, d] of Object.entries(ev.policyFinance)) {
+        if (d.titleOnly && d.publisher === item.bank && /政策性金融工具/.test(d.title || "")) delete ev.policyFinance[k];
+      }
+    } else log.push(`policy-finance mirror miss ${item.bank}`);
+  }
+}
+
+// ---- Special-bond use / issuance progress: MOF press conferences & fiscal reports (no monthly use series found) ----
+ev.specialBondUse = ev.specialBondUse || {};
+{
+  const cfg = JSON.parse(fs.readFileSync(path.join(root, "config/special-bond-use-sources.json"), "utf8"));
+  // Also scan recent MOF 财政新闻 titles.
+  const list = get("https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/");
+  const extra = [];
+  if (list) {
+    for (const m of list.matchAll(/href="\.\/(\d{6}\/t\d{8}_\d+\.htm)"[^>]*title="([^"]+)"/g)) {
+      if (/专项债|地方债|财政政策执行|财政收支情况新闻发布/.test(m[2])) extra.push({ url: "https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/" + m[1], publisher: `财政部财政新闻·${m[2].slice(0, 40)}`, releaseDate: `${m[1].slice(8,12)}-${m[1].slice(12,14)}-${m[1].slice(14,16)}` });
+    }
+  } else log.push("mof news list unreachable");
+  for (const src of [...cfg.items, ...extra.slice(0, 8)]) {
+    if (ev.specialBondUse[src.url]?.statements?.length) continue;
+    const html = get(src.url, { cache: true });
+    if (!html) { log.push(`special-bond-use unreachable ${src.url}`); continue; }
+    const statements = parseSpecialBondUseStatements(P.pageText(html).compact, src);
+    if (statements.length) ev.specialBondUse[src.url] = { ...src, statements };
+  }
+  // Caixin: search for a national use series; local city series are not substitutes.
+  try {
+    const out = execFileSync(process.execPath, ["--experimental-strip-types", path.join(root, "scripts/caixin-fetch.mjs"), "search", "地方政府专项债券"], { cwd: root, maxBuffer: 4 << 20, timeout: 60000, env: process.env }).toString("utf8");
+    const j = JSON.parse(out);
+    const national = (j.series || []).filter((s) => !/：|:/.test(s.name.split(":")[0] || "") || /全国|中国:/.test(s.name));
+    ev.specialBondUse.caixinNote = { searched: "地方政府专项债券", hits: (j.series || []).length, nationalHits: national.length,
+      sample: (j.series || []).slice(0, 3).map((s) => ({ id: s.series_id, name: s.name, source: s.source, frequency: s.frequency })),
+      conclusion: national.length ? "found candidate national series" : "Caixin hits are local city fund lines, not a national special-bond use series" };
+  } catch (e) { log.push(`caixin special-bond search: ${e.message.split("\n")[0]}`); }
+}
+
 // ---- Annual targets (quota denominators) from the Government Work Report full text ----
 ev.annualTargets = ev.annualTargets || {};
 try {
@@ -326,4 +386,4 @@ ev.log = log;
 fs.writeFileSync(output + ".tmp", JSON.stringify(ev, null, 1) + "\n");
 fs.renameSync(output + ".tmp", output);
 console.log(JSON.stringify({ cnbs: Object.keys(ev.cnbs).sort().at(-1) ?? null, bis: Object.fromEntries(Object.entries(ev.bis).map(([k, v]) => [k, v.rows.at(-1)])),
-  policyDocs: Object.keys(ev.policyDocs).length, byPublisher: Object.values(ev.policyDocs).reduce((a, d) => ({ ...a, [d.publisher]: (a[d.publisher] || 0) + 1 }), {}), bodyMatched: Object.values(ev.policyDocs).filter((d) => /body/.test(d.matchedBy || "")).length, localBonds: Object.keys(ev.localBonds).sort().at(-1) ?? null, localBondMonths: Object.keys(ev.localBonds).length, policyFinance: Object.keys(ev.policyFinance).length, policyFinanceWithFacts: Object.values(ev.policyFinance).filter((x) => x.facts?.length).length, annualTargets: ev.annualTargets, attachmentsRead: Object.values(ev.policyDocs).filter((d) => d.attachmentTextChars).length, browserCalls, toolTables: Object.keys(ev.toolTables).sort().at(-1) ?? null, rrrNotices: Object.keys(ev.rrrNotices).length, rrrScan: ev.rrrNoticeScan, problems: log }));
+  policyDocs: Object.keys(ev.policyDocs).length, byPublisher: Object.values(ev.policyDocs).reduce((a, d) => ({ ...a, [d.publisher]: (a[d.publisher] || 0) + 1 }), {}), bodyMatched: Object.values(ev.policyDocs).filter((d) => /body/.test(d.matchedBy || "")).length, localBonds: Object.keys(ev.localBonds).sort().at(-1) ?? null, localBondMonths: Object.keys(ev.localBonds).length, policyFinance: Object.keys(ev.policyFinance).length, policyFinanceWithFacts: Object.values(ev.policyFinance).filter((x) => x.facts?.length).length, policyFinanceReposts: Object.values(ev.policyFinance).filter((x) => x.sourceKind === "repost").length, specialBondUseSources: Object.keys(ev.specialBondUse || {}).filter((k) => k !== "caixinNote").length, annualTargets: ev.annualTargets, attachmentsRead: Object.values(ev.policyDocs).filter((d) => d.attachmentTextChars).length, browserCalls, toolTables: Object.keys(ev.toolTables).sort().at(-1) ?? null, rrrNotices: Object.keys(ev.rrrNotices).length, rrrScan: ev.rrrNoticeScan, problems: log }));
